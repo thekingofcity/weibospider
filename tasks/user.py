@@ -38,9 +38,9 @@ def crawl_person_infos(uid):
         return
 
     # Crawl fans and followers
-    if not is_crawled:
-        app.send_task('tasks.user.crawl_follower_fans', args=(uid,), queue='fans_followers',
-                      routing_key='for_fans_followers')
+    # if not is_crawled:
+    #     app.send_task('tasks.user.crawl_follower_fans', args=(uid,), queue='fans_followers',
+    #                   routing_key='for_fans_followers')
 
 
 @app.task(ignore_result=True)
