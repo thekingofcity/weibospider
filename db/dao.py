@@ -79,7 +79,7 @@ class SeedidsOper:
         Get all user id to be crawled
         :return: user ids
         """
-        return db_session.query(SeedIds.uid).filter(text('is_crawled=0')).all()
+        return db_session.query(SeedIds.uid).filter(text('is_crawled=0')).limit(100000)
 
     @classmethod
     def get_home_ids(cls):
