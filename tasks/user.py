@@ -58,7 +58,7 @@ def crawl_person_infos_not_in_seed_ids(uid):
 def execute_user_task():
     seeds = SeedidsOper.get_seed_ids()
     if seeds:
-        print(len(seeds))
+        print(seeds.count())
         for seed in seeds:
             app.send_task('tasks.user.crawl_person_infos', args=(seed.uid,), queue='user_crawler',
                           routing_key='for_user_info')
