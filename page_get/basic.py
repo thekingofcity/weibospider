@@ -101,8 +101,8 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
         if is_404(page):
             crawler.warning('{} seems to be 404'.format(url))
             return ''
-        Urls.store_crawl_url(url, 1)
+        # Urls.store_crawl_url(url, 1)
         return page
 
-    Urls.store_crawl_url(url, 0)
+    # Urls.store_crawl_url(url, 0)
     return ''
