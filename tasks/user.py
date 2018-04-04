@@ -10,11 +10,11 @@ from celery.exceptions import SoftTimeLimitExceeded
 
 @app.task(ignore_result=True)
 def crawl_follower_fans(uid):
-    seed = SeedidsOper.get_seed_by_id(uid)
-    if seed.other_crawled == 0:
+    get_fans_or_followers_ids(uid, 2)
+    # seed = SeedidsOper.get_seed_by_id(uid)
+    # if seed.other_crawled == 0:
         # rs = get_fans_or_followers_ids(uid, 1)
-        rs = list()
-        rs.extend(get_fans_or_followers_ids(uid, 2))
+        # rs.extend(get_fans_or_followers_ids(uid, 2))
         # datas = set(rs)
         # # If data already exits, just skip it
         # if datas:
