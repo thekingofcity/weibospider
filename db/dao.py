@@ -5,7 +5,7 @@ from sqlalchemy.exc import InvalidRequestError
 
 from .basic import db_session
 from .models import (
-    LoginInfo, KeywordsWbdata, KeyWords, SeedIds, user_relation
+    LoginInfo, KeywordsWbdata, KeyWords, SeedIds, user_relation,
     WeiboComment, WeiboRepost, User, WeiboData, WeiboPraise
 )
 from decorators import db_commit_decorator
