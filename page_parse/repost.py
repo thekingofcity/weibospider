@@ -34,11 +34,11 @@ def get_total_page(html):
 @parse_decorator([])
 def get_repost_list(html, mid):
     """
-       Get repost details
-       :param html: page source
-       :param mid: weibo mid
-       :return: list of repost infos
-       """
+    Get repost details
+    :param html: page source
+    :param mid: weibo mid
+    :return: list of repost infos
+    """
     cont = get_html_cont(html)
     if not cont:
         return list()
