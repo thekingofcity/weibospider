@@ -46,6 +46,7 @@ def get_repost_list(html, mid):
     soup = BeautifulSoup(cont, 'html.parser')
     repost_list = list()
     reposts = soup.find_all(attrs={'action-type': 'feed_list_item'})
+    print(len(reposts))
 
     for repost in reposts:
         wb_repost = WeiboRepost()
@@ -63,6 +64,8 @@ def get_repost_list(html, mid):
                                                     get('href'))
             parents = repost.find(attrs={'class': 'WB_text'}).find(attrs={'node-type': 'text'})
             wb_repost.root_weibo_id = mid
+
+            print(wb_repost.user_id)
 
             # Save the current repost user's name and id as the middle result
             IdNames.store_id_name(wb_repost.user_name, wb_repost.user_id)
