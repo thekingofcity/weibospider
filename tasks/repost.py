@@ -27,6 +27,7 @@ def crawl_repost_page(mid, uid):
     limit = get_max_repost_page() + 1
     first_repost_data = crawl_repost_by_page(mid, 1)
     total_page = repost.get_total_page(first_repost_data[0])
+    print(total_page)
     repost_datas = first_repost_data[1]
 
     if not repost_datas:
