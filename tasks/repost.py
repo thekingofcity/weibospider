@@ -19,6 +19,7 @@ def crawl_repost_by_page(mid, page_num):
     repost_datas = repost.get_repost_list(html, mid)
     if page_num == 1:
         WbDataOper.set_weibo_repost_crawled(mid)
+    RepostOper.add_all(repost_datas)
     return html, repost_datas
 
 
@@ -55,7 +56,7 @@ def crawl_repost_page(mid, uid):
             repost_obj.parent_user_id = user_id
         repost_datas[index] = repost_obj
 
-    RepostOper.add_all(repost_datas)
+    # RepostOper.add_all(repost_datas)
 
 
 @app.task(ignore_result=True)
