@@ -85,6 +85,5 @@ def get_repost_list(html, mid):
             parser.error('repost parse error occurred，the detail is {}'.format(e))
         else:
             repost_list.append(wb_repost)
-            print(wb_repost.user_id)
 
     return repost_list

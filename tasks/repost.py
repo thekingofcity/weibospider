@@ -37,6 +37,8 @@ def crawl_repost_page(mid, uid):
     if total_page < limit:
         limit = total_page + 1
 
+    print(total_page, limit)
+
     for page_num in range(2, limit):
         cur_repost_datas = crawl_repost_by_page(mid, page_num)[1]
         if cur_repost_datas:
