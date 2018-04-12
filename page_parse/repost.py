@@ -64,8 +64,6 @@ def get_repost_list(html, mid):
             parents = repost.find(attrs={'class': 'WB_text'}).find(attrs={'node-type': 'text'})
             wb_repost.root_weibo_id = mid
 
-            print(wb_repost.repost_cont)
-
             # Save the current repost user's name and id as the middle result
             IdNames.store_id_name(wb_repost.user_name, wb_repost.user_id)
 
@@ -87,5 +85,6 @@ def get_repost_list(html, mid):
             parser.error('repost parse error occurred，the detail is {}'.format(e))
         else:
             repost_list.append(wb_repost)
+            print(wb_repost.user_id)
 
     return repost_list
