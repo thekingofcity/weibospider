@@ -12,7 +12,7 @@ from config import get_max_repost_page
 BASE_URL = 'http://weibo.com/aj/v6/mblog/info/big?ajwvr=6&id={}&&page={}'
 
 
-@app.task
+@app.task(ignore_result=True)
 def crawl_repost_by_page(mid, page_num):
     cur_url = BASE_URL.format(mid, page_num)
     html = get_page(cur_url, auth_level=1, is_ajax=True)
@@ -42,19 +42,21 @@ def crawl_repost_page(mid, uid):
     print(total_page, limit)
 
     for page_num in range(2, limit):
-        cur_repost_datas = crawl_repost_by_page(mid, page_num)[1]
-        if cur_repost_datas:
-            repost_datas.extend(cur_repost_datas)
+        app.send_task('tasks.repost.crawl_repost_by_page', args=(mid, page_num), queue='repost_page_crawler',
+                      routing_key='repost_page_info')
+        # cur_repost_datas = crawl_repost_by_page(mid, page_num)[1]
+        # if cur_repost_datas:
+        #     repost_datas.extend(cur_repost_datas)
 
-    for index, repost_obj in enumerate(repost_datas):
-        user_id = IdNames.fetch_uid_by_name(repost_obj.parent_user_name)
-        if not user_id:
-            # when it comes to errors, set the args to default(root)
-            repost_obj.parent_user_id = root_user.uid
-            repost_obj.parent_user_name = root_user.name
-        else:
-            repost_obj.parent_user_id = user_id
-        repost_datas[index] = repost_obj
+    # for index, repost_obj in enumerate(repost_datas):
+    #     user_id = IdNames.fetch_uid_by_name(repost_obj.parent_user_name)
+    #     if not user_id:
+    #         # when it comes to errors, set the args to default(root)
+    #         repost_obj.parent_user_id = root_user.uid
+    #         repost_obj.parent_user_name = root_user.name
+    #     else:
+    #         repost_obj.parent_user_id = user_id
+    #     repost_datas[index] = repost_obj
 
     # RepostOper.add_all(repost_datas)
 
