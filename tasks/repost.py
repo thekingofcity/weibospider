@@ -15,7 +15,7 @@ BASE_URL = 'http://weibo.com/aj/v6/mblog/info/big?ajwvr=6&id={}&&page={}'
 @app.task(ignore_result=True)
 def crawl_repost_by_page(mid, page_num):
     cur_url = BASE_URL.format(mid, page_num)
-    html = get_page(cur_url, auth_level=1, is_ajax=True)
+    html = get_page(cur_url, auth_level=2, is_ajax=True)
     repost_datas = repost.get_repost_list(html, mid)
     if page_num == 1:
         WbDataOper.set_weibo_repost_crawled(mid)
