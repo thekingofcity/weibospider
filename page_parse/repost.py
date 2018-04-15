@@ -89,4 +89,7 @@ def get_repost_list(html, mid):
         else:
             repost_list.append(wb_repost)
 
+
+    print('All done')
+
     return repost_list
