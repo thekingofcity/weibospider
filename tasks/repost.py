@@ -44,6 +44,7 @@ def crawl_repost_page(mid, uid):
     for page_num in range(2, limit):
         app.send_task('tasks.repost.crawl_repost_by_page', args=(mid, page_num), queue='repost_page_crawler',
                       routing_key='repost_page_info')
+        print(page_num)
         # cur_repost_datas = crawl_repost_by_page(mid, page_num)[1]
         # if cur_repost_datas:
         #     repost_datas.extend(cur_repost_datas)
