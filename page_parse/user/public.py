@@ -192,7 +192,8 @@ def get_fans_or_follows(html, uid, type):
                         isDuplicate = UserRelationOper.get_user_by_uid(uid, r, type)
                         if not isDuplicate:
                             n = re.search(patternFROM, follow.text)
-                            n = n.group(0)[2:len(n)-2]
+                            n = n.group(0)
+                            n = n[2:len(n)-2]
                             user_ids.append(r)
                             relations.append(UserRelation(uid, r, type, n))
 
