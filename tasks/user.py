@@ -11,7 +11,10 @@ from celery.exceptions import SoftTimeLimitExceeded
 @app.task(ignore_result=True)
 def crawl_follower_fans(uid, verify_type):
     rs = get_fans_or_followers_ids(uid, 1, verify_type)
-    datas = set(rs)
+    if rs:
+        for uid in rs:
+            app.send_task('tasks.user.crawl_person_infos', args=(uid,), queue='user_crawler',
+                          routing_key='for_user_info')
     # seed = SeedidsOper.get_seed_by_id(uid)
     # if seed.other_crawled == 0:
         # rs = get_fans_or_followers_ids(uid, 1)
@@ -46,7 +49,7 @@ def crawl_person_infos(uid):
     # if not is_crawled:
     #     app.send_task('tasks.user.crawl_follower_fans', args=(uid,), queue='fans_followers',
     #                   routing_key='for_fans_followers')
-    
+
     # By adding '--soft-time-limit secs' when you start celery, this will resend task to broker
     # e.g. celery -A tasks.workers -Q user_crawler worker -l info -c 1 --soft-time-limit 10
     except SoftTimeLimitExceeded:
@@ -74,3 +77,9 @@ def execute_user_task():
         for seed in seeds:
             app.send_task('tasks.user.crawl_person_infos', args=(seed.uid,), queue='user_crawler',
                           routing_key='for_user_info')
+
+
+def execute_followers_fans_task(uid, verify_type):
+    app.send_task('tasks.user.crawl_follower_fans', args=(uid, verify_type), queue='fans_followers',
+                  routing_key='for_fans_followers')
+
