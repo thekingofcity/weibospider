@@ -98,7 +98,6 @@ def crawl_weibo_datas(uid):
     SeedidsOper.set_seed_home_crawled(uid)
 
 
-@app.task(ignore_result=True)
 def execute_home_task():
     # you can have many strategies to crawl user's home page, here we choose table seed_ids's uid
     # whose home_crawl is 0

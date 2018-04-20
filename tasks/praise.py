@@ -33,7 +33,7 @@ def crawl_praise_page(mid):
         app.send_task('tasks.praise.crawl_praise_by_page', args=(mid, page_num), queue='praise_page_crawler',
                       routing_key='praise_page_info')
 
-@app.task(ignore_result=True)
+
 def execute_praise_task():
     weibo_datas = WbDataOper.get_weibo_praise_not_crawled()
     for weibo_data in weibo_datas:

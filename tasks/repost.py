@@ -62,7 +62,6 @@ def crawl_repost_page(mid, uid):
     # RepostOper.add_all(repost_datas)
 
 
-@app.task(ignore_result=True)
 def execute_repost_task():
     # regard current weibo url as the original url, you can also analyse from the root url
     weibo_datas = WbDataOper.get_weibo_repost_not_crawled()

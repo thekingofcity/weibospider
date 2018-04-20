@@ -14,7 +14,6 @@ def login_task(name, password):
 
 # There should be login interval, if too many accounts login at the same time from the same ip, all the
 # accounts can be banned by weibo's anti-cheating system
-@app.task(ignore_result=True)
 def execute_login_task():
     infos = LoginInfoOper.get_login_info()
     # Clear all stacked login tasks before each time for login

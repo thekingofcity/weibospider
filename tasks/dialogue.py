@@ -60,7 +60,6 @@ def crawl_dialogue(mid):
                       routing_key='comment_page_info')
 
 
-@app.task(ignore_result=True)
 def execute_dialogue_task():
     weibo_datas = WbDataOper.get_weibo_dialogue_not_crawled()
     for weibo_data in weibo_datas:
