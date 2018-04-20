@@ -10,7 +10,12 @@ from celery.exceptions import SoftTimeLimitExceeded
 
 @app.task(ignore_result=True)
 def crawl_follower_fans(uid, verify_type):
-    rs = get_fans_or_followers_ids(uid, 1, verify_type)
+    try:
+        rs = get_fans_or_followers_ids(uid, 1, verify_type)
+    except SoftTimeLimitExceeded:
+        crawler.error("Exception SoftTimeLimitExceeded    uid={uid}".format(uid=uid))
+        app.send_task('tasks.user.crawl_follower_fans', args=(uid, verify_type), queue='fans_followers',
+                    routing_key='for_fans_followers')
     if rs:
         for uid in rs:
             app.send_task('tasks.user.crawl_person_infos', args=(uid,), queue='user_crawler',
