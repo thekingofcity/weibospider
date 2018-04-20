@@ -74,7 +74,6 @@ def crawl_person_infos_not_in_seed_ids(uid):
     get_user_profile(uid)
 
 
-@app.task(ignore_result=True)
 def execute_user_task():
     seeds = SeedidsOper.get_seed_ids()
     if seeds:
