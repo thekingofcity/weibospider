@@ -1,11 +1,15 @@
 from .workers import app
-from db.dao import SeedidsOper
+from db.dao import (
+    UserOper, SeedidsOper)
 from page_get import (
     get_fans_or_followers_ids,
     get_profile, get_user_profile
 )
 from logger import crawler
 from celery.exceptions import SoftTimeLimitExceeded
+
+import pymysql
+import datetime
 
 
 @app.task(ignore_result=True)
@@ -81,6 +85,23 @@ def execute_user_task():
         for seed in seeds:
             app.send_task('tasks.user.crawl_person_infos', args=(seed.uid,), queue='user_crawler',
                           routing_key='for_user_info')
+
+
+def execute_extend_user_task():
+    
+    t1 = (datetime.datetime.now()+datetime.timedelta(days=-1)).strftime("%Y-%m-%d") + " 00:00:00.000"
+    t2 = (datetime.datetime.now()+datetime.timedelta(days=-1)).strftime("%Y-%m-%d") + " 23:59:59.000"
+
+    conn = pymysql.connect(host="127.0.0.1",port=43709,user='weibospider',passwd='FkPxc7ZZBLzgTbq6',db='weibo',charset='utf8')
+    cursor = conn.cursor()
+    count = cursor.execute('SELECT DISTINCT `follow_or_fans_id` from user_relation \
+                    where crawl_time >= "' + t1 + '" and crawl_time <= "' + t2 + '"')
+    uids = cursor.fetchall()
+    for uid in uids:
+        user = UserOper.get_user_by_uid(uid[0])
+        if not user:
+            app.send_task('tasks.user.crawl_person_infos', args=(uid[0],), queue='user_crawler',
+                            routing_key='for_user_info')
 
 
 def execute_followers_fans_task(uid, verify_type):
