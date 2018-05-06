@@ -1,10 +1,8 @@
 from .workers import app
 from db.dao import (
     UserOper, SeedidsOper)
-from page_get import (
-    get_fans_or_followers_ids,
-    get_profile, get_user_profile
-)
+from page_get.user import (get_fans_or_followers_ids, get_profile, get_user_profile,
+                      get_newcard_by_name)
 from logger import crawler
 from celery.exceptions import SoftTimeLimitExceeded
 
@@ -26,13 +24,13 @@ def crawl_follower_fans(uid, verify_type):
                           routing_key='for_user_info')
     # seed = SeedidsOper.get_seed_by_id(uid)
     # if seed.other_crawled == 0:
-        # rs = get_fans_or_followers_ids(uid, 1)
-        # rs.extend(get_fans_or_followers_ids(uid, 2))
-        # datas = set(rs)
-        # # If data already exits, just skip it
-        # if datas:
-        #     SeedidsOper.insert_seeds(datas)
-        # SeedidsOper.set_seed_other_crawled(uid)
+    # rs = get_fans_or_followers_ids(uid, 1)
+    # rs.extend(get_fans_or_followers_ids(uid, 2))
+    # datas = set(rs)
+    # # If data already exits, just skip it
+    # if datas:
+    #     SeedidsOper.insert_seeds(datas)
+    # SeedidsOper.set_seed_other_crawled(uid)
 
 
 @app.task(ignore_result=True)
@@ -78,6 +76,17 @@ def crawl_person_infos_not_in_seed_ids(uid):
     get_user_profile(uid)
 
 
+@app.task(ignore_result=True)
+def crawl_person_infos_by_name(name):
+    """
+    Crawl user info not in seed_ids
+    """
+    if not name:
+        return
+
+    get_newcard_by_name(name)
+
+
 def execute_user_task():
     seeds = SeedidsOper.get_seed_ids()
     if seeds:
@@ -88,7 +97,7 @@ def execute_user_task():
 
 
 def execute_extend_user_task():
-    
+
     t1 = (datetime.datetime.now()+datetime.timedelta(days=-1)).strftime("%Y-%m-%d") + " 00:00:00.000"
     t2 = (datetime.datetime.now()+datetime.timedelta(days=-1)).strftime("%Y-%m-%d") + " 23:59:59.000"
 
@@ -107,4 +116,3 @@ def execute_extend_user_task():
 def execute_followers_fans_task(uid, verify_type):
     app.send_task('tasks.user.crawl_follower_fans', args=(uid, verify_type), queue='fans_followers',
                   routing_key='for_fans_followers')
-

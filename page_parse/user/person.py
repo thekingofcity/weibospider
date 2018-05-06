@@ -1,10 +1,12 @@
 import re
+import json
 
 from bs4 import BeautifulSoup
 
 from ..user import public
 from decorators import parse_decorator
-from db.models import User
+from db.models import (User, UserRelation)
+from db.dao import UserRelationOper
 
 
 @parse_decorator(0)
@@ -150,3 +152,36 @@ def get_isFan(html, uid):
         if m and uid in script.string:
             return 1
     return 0
+
+
+def get_uid_and_samefollow_by_new_card(html):
+    pattern = r'try\{(.*)\(\{(.*)\}\)\}catch.*'
+    pattern = re.compile(pattern)
+    info = "{" + pattern.match(html).groups()[1] + "}"
+    info = json.loads(info, encoding='utf-8').get('data', '')
+
+    pattern = 'uid="(.*?)"'
+    pattern = re.compile(pattern)
+    uid = pattern.search(info).groups()[0]
+
+    soup = BeautifulSoup(info, 'html.parser')
+    samefollow_divs = soup.find_all('div', class_='item W_autocut')
+    for div in samefollow_divs:
+        # uid -> r    1
+        # uid is a fan of r
+        relations = list()
+        type = 1
+        n = ""    # from_where    since we can not get this intel from newcard
+        if "TangVision" in div.text:
+            r = 1454338611
+            isDuplicate = UserRelationOper.get_user_by_uid(r, uid, type)
+            if not isDuplicate:
+                relations.append(UserRelation(uid, r, type, n))
+        if "TangVisionGirl" in div.text:
+            r = 3189165860
+            isDuplicate = UserRelationOper.get_user_by_uid(r, uid, type)
+            if not isDuplicate:
+                relations.append(UserRelation(uid, r, type, n))
+        
+        if relations:
+            UserRelationOper.add_all(relations)

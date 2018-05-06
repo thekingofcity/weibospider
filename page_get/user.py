@@ -1,4 +1,5 @@
 import json
+import time
 import re
 import requests
 from urllib.parse import quote
@@ -13,6 +14,7 @@ from db.dao import (
 from page_parse.user import (
     enterprise, person, public)
 BASE_URL = 'http://weibo.com/p/{}{}/info?mod=pedit_more'
+NEWCARD_URL = 'https://www.weibo.com/aj/v6/user/newcard?ajwvr=6&name={}&type=1&callback=STK_{}39'
 SAMEFOLLOW_URL = 'https://weibo.com/p/100505{}/follow?relate=same_follow&amp;from=page_100505_profile&amp;wvr=6&amp;mod=bothfollow'
 # SAMEFOLLOW: only crawl user with 100505 domain
 
@@ -182,3 +184,30 @@ def get_uid_by_name(user_name):
     except Exception as e:
         print(e)
         return None
+
+
+def get_newcard_by_name(user_name):
+    """
+    Get user by user_name through newcard method.\n
+    Although it requires login, there should be less chance to get banned since it requests without s.weibo.com
+    """
+    user = UserOper.get_user_by_name(user_name)
+    if user:
+        return user.uid
+    url = NEWCARD_URL.format(quote(user_name), int(round(time.time() * 1000)))
+    page = get_page(url)
+    person.get_uid_and_samefollow_by_new_card(page)
+
+
+def get_newcard_by_uid(uid):
+    """
+    ** This function is strongly not recommended if you don't need SAMEFOLLOW **\n
+    Get user by uid through newcard method.\n
+    Although it requires login, there should be less chance to get banned since it requests without s.weibo.com.
+    """
+    user = UserOper.get_user_by_uid(uid)
+    if user:
+        return user.uid
+    url = NEWCARD_URL.format(uid, int(round(time.time() * 1000)))
+    page = get_page(url)
+    person.get_uid_and_samefollow_by_new_card(page)
