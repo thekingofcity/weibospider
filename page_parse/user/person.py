@@ -92,14 +92,14 @@ def get_detail(html, uid):
                         user.description = description.encode('gbk', 'ignore').decode('gbk')
                     elif '注册时间：' in each_str:
                         user.register_time = each.find(attrs={'class': 'pt_detail'}).get_text().replace('\t', '').replace(
-                            '\r\n', '')
+                            '\r\n', '').strip()
 
             if '标签信息' in basic_str:
                 basic_info = each_module.find_all(attrs={'class': 'li_1 clearfix'})
                 for each in basic_info:
                     if '标签：' in each.get_text():
                         user.tags = each.find(attrs={'class': 'pt_detail'}).get_text().replace('\t', '').replace(
-                            '\n\n\n', '') .strip().replace('\r\n', ';')
+                            '\n\n\n', '') .strip().replace('\r\n', ';').strip()
 
             if '教育信息' in basic_str:
                 basic_info = each_module.find_all(attrs={'class': 'li_1 clearfix'})
