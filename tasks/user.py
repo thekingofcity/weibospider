@@ -90,7 +90,6 @@ def crawl_person_infos_by_name(name):
 def execute_user_task():
     seeds = SeedidsOper.get_seed_ids()
     if seeds:
-        print(seeds.count())
         for seed in seeds:
             app.send_task('tasks.user.crawl_person_infos', args=(seed.uid,), queue='user_crawler',
                           routing_key='for_user_info')
