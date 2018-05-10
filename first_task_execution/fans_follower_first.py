@@ -1,6 +1,6 @@
 import sys
 
-from res import uid2name__
+from res import resources
 
 sys.path.append('.')
 sys.path.append('..')
@@ -14,8 +14,9 @@ if __name__ == '__main__':
         else:
             print("Please input standard uid.")
     elif len(sys.argv) == 1:
-        for uid in uid2name__:
-            execute_followers_fans_task(uid, uid2name__[uid][1])
+        res = resources().fetchAll()
+        for uid in res:
+            execute_followers_fans_task(uid, res[uid][1])
     elif len(sys.argv) < 3:
         print("Please specific an uid and a verify_type.")
     else:
