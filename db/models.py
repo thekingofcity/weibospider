@@ -1,5 +1,6 @@
 from .basic import Base
 from .tables import *
+from sqlalchemy import func
 
 
 class LoginInfo(Base):
@@ -63,6 +64,7 @@ class UserRelation(Base):
         self.follow_or_fans_id = other_id
         self.type = type
         self.from_where = from_where
+        self.crawl_time = func.now()
         
     def __repr__(self):
         return 'user_id:{},follow_or_fans_id:{},type:{},from_where:{}'.format(self.user_id, self.follow_or_fans_id, self.type, self.from_where)
