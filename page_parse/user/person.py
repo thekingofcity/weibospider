@@ -150,7 +150,7 @@ def get_isFan(html, uids, current_uid):
 
     user_ids = list()  # Contains uids that the user and crawler both follow
     intersection_ids = list()  # Contains the intersection of param uids and user_ids
-    relations = list()
+    relations = list()  # Contains list to be stored in UserRelation table
     for script in scripts:
         m = pattern.search(script.string)
         # Find the <script>FM.view({"ns":"pl.content.followTab.index","domid":"Pl_Official_HisRelation__59",...
@@ -177,6 +177,7 @@ def get_isFan(html, uids, current_uid):
                 relations.append(UserRelation(uid, current_uid, type, n, False))
             UserRelationOper.add_all(relations)
             break
+    # legacy support
     if intersection_ids:
         return 1
     else:
