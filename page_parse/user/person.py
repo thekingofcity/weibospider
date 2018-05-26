@@ -106,7 +106,7 @@ def get_detail(html, uid):
                 for each in basic_info:
                     if '大学：' in each.get_text():
                         user.education_info = each.find(attrs={'class': 'pt_detail'}).get_text().replace('\r\n', ',') \
-                            .replace('\t', '').replace('\n', ';').lstrip(';').rstrip(';')
+                            .replace('\t', '').replace('\n', ';').lstrip(';').rstrip(';').replace(' ', '')
 
             if '工作信息' in basic_str:
                 basic_info = each_module.find_all(attrs={'class': 'li_1 clearfix'})
