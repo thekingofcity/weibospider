@@ -116,7 +116,7 @@ def get_detail(html, uid):
                         jobs = each.find_all(attrs={'class': 'pt_detail'})
                         for job in jobs:
                             jobs_info.append(job.get_text().replace('\r\n', '').replace('\t', '').replace('\n', ''))
-                user.work_info = ';'.join(jobs_info)
+                user.work_info = ';'.join(jobs_info).replace(' ', '')
 
             if '联系信息' in basic_str:
                 basic_info = each_module.find_all(attrs={'class': 'li_1 clearfix'})
@@ -129,7 +129,7 @@ def get_detail(html, uid):
                         contact_info.append('email:' + each.find(attrs={'class': 'pt_detail'}).get_text())
                     if 'MSN：' in each.get_text():
                         contact_info.append('msn:' + each.find(attrs={'class': 'pt_detail'}).get_text())
-                user.contact_info = ';'.join(contact_info)
+                user.contact_info = ';'.join(contact_info).replace(' ', '')
         except Exception as why:
             print('解析出错，具体原因为{why}'.format(why=why))
 
