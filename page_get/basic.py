@@ -71,7 +71,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError, AttributeError) as e:
             crawler.warning('Excepitons are raised when crawling {}.Here are details:{}'.format(url, e))
             count += 1
-            time.sleep(EXCP_INTERAL)
+            time.sleep(int(EXCP_INTERAL))
             continue
 
         if resp.status_code == 414:

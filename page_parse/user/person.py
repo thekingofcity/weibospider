@@ -10,15 +10,15 @@ from db.dao import UserRelationOper
 
 
 @parse_decorator(0)
-def get_friends(html):
+def get_friends(soup):
     """
     :param html:
     :return: 返回关注数
     """
-    cont = public.get_left(html)
-    if cont == '':
-        return 0
-    soup = BeautifulSoup(cont, 'html.parser')
+    # cont = public.get_left(html)
+    # if cont == '':
+    #     return 0
+    # soup = BeautifulSoup(cont, 'html.parser')
     try:
         return int(soup.find_all('strong')[0].get_text())
     except Exception:
@@ -26,15 +26,15 @@ def get_friends(html):
 
 
 @parse_decorator(0)
-def get_fans(html):
+def get_fans(soup):
     """
     :param html:
     :return: 返回粉丝数
     """
-    cont = public.get_left(html)
-    if cont == '':
-        return 0
-    soup = BeautifulSoup(cont, 'html.parser')
+    # cont = public.get_left(html)
+    # if cont == '':
+    #     return 0
+    # soup = BeautifulSoup(cont, 'html.parser')
     try:
         return int(soup.find_all('strong')[1].get_text())
     except Exception:
@@ -42,15 +42,15 @@ def get_fans(html):
 
 
 @parse_decorator(0)
-def get_status(html):
+def get_status(soup):
     """
     :param html:
     :return: 返回微博总数
     """
-    cont = public.get_left(html)
-    if cont == '':
-        return 0
-    soup = BeautifulSoup(cont, 'html.parser')
+    # cont = public.get_left(html)
+    # if cont == '':
+    #     return 0
+    # soup = BeautifulSoup(cont, 'html.parser')
     try:
         return int(soup.find_all('strong')[2].get_text())
     except Exception:
@@ -59,9 +59,9 @@ def get_status(html):
 
 @parse_decorator(None)
 # todo 补充所有信息， 优化代码
-def get_detail(html, uid):
+def get_detail(soup, uid):
     user = User(uid)
-    cont = public.get_right(html)
+    cont = public.get_right(soup)
     if cont == '':
         return None
     soup = BeautifulSoup(cont, 'html.parser')

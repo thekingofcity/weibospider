@@ -80,11 +80,11 @@ def get_headimg(html):
 
 
 @parse_decorator('')
-def get_left(html):
+def get_left(soup):
     """
     The left part of the page, which is public
     """
-    soup = BeautifulSoup(html, "html.parser")
+    # soup = BeautifulSoup(html, "html.parser")
     scripts = soup.find_all('script')
     pattern = re.compile(r'FM.view\((.*)\)')
     cont = ''
@@ -109,13 +109,13 @@ def get_left(html):
 
 
 @parse_decorator('')
-def get_right(html):
+def get_right(soup):
     """
     Parse the right part of user detail
     :param html: page source
     :return: the right part of user info page
     """
-    soup = BeautifulSoup(html, "html.parser")
+    # soup = BeautifulSoup(html, "html.parser")
     scripts = soup.find_all('script')
     pattern = re.compile(r'FM.view\((.*)\)')
     cont = ''
@@ -156,7 +156,7 @@ def get_level(html):
 
 
 @parse_decorator([])
-def get_fans_or_follows(html, uid, type):
+def get_fans_or_follows(html, uid, type, url = None):
     """
     Get fans or follows and store their relationships
     :param html: current page source
@@ -192,8 +192,12 @@ def get_fans_or_follows(html, uid, type):
                         isDuplicate = UserRelationOper.get_user_by_uid(uid, r, type)
                         if not isDuplicate:
                             n = re.search(patternFROM, follow.text)
-                            n = n.group(0)
-                            n = n[2:len(n)-2]
+                            # 存在没有关注来源的情况
+                            if n is not None:
+                                n = n.group(0)
+                                n = n[2:len(n)-2]
+                            else:
+                                n = ""
                             user_ids.append(r)
                             relations.append(UserRelation(uid, r, type, n))
             break

@@ -3,6 +3,7 @@ import time
 import re
 import requests
 from urllib.parse import quote
+from bs4 import BeautifulSoup
 
 from db.models import User
 from logger import storage
@@ -20,21 +21,40 @@ SAMEFOLLOW_URL = 'https://weibo.com/p/100505{}/follow?relate=same_follow&amp;fro
 
 
 def get_user_detail(user_id, html):
-    user = person.get_detail(html, user_id)
+    soup = BeautifulSoup(html, "html.parser")
+    user = person.get_detail(soup, user_id)
     if user is not None:
         user.uid = user_id
-        user.follows_num = person.get_friends(html)
-        user.fans_num = person.get_fans(html)
-        user.wb_num = person.get_status(html)
+        cont = public.get_left(soup)
+
+        if cont == '':
+            user.follows_num = 0
+            user.fans_num = 0
+            user.wb_num = 0
+            return 0
+        else:
+            cont_soup = BeautifulSoup(cont, 'html.parser')
+            user.follows_num = person.get_friends(cont_soup)
+            user.fans_num = person.get_fans(cont_soup)
+            user.wb_num = person.get_status(cont_soup)
+
     return user
 
 
-def get_enterprise_detail(user_id, html):
+def get_enterprise_detail(user_id, html, url=None):
     user = User(user_id)
-    user.follows_num = enterprise.get_friends(html)
-    user.fans_num = enterprise.get_fans(html)
-    user.wb_num = enterprise.get_status(html)
-    user.description = enterprise.get_description(html).encode('gbk', 'ignore').decode('gbk')
+    soup = BeautifulSoup(html, 'html.parser')
+
+    detail_arr = soup.find_all('strong')
+    if len(detail_arr) >= 3:
+        user.follows_num = enterprise.get_friends(detail_arr,url=url)
+        user.fans_num = enterprise.get_fans(detail_arr,url=url)
+        user.wb_num = enterprise.get_status(detail_arr,url=url)
+    else:
+        user.follows_num = 0
+        user.fans_num = 0
+        user.wb_num = 0
+    user.description = enterprise.get_description(soup,url=url).encode('gbk', 'ignore').decode('gbk')
     return user
 
 
@@ -72,7 +92,7 @@ def get_url_from_web(user_id):
                 person.get_isFan(isFanHtml, samefollow_uid, user_id)
         # enterprise or service
         else:
-            user = get_enterprise_detail(user_id, html)
+            user = get_enterprise_detail(user_id, html, url=url)
 
         if user is None:
             return None
@@ -160,7 +180,7 @@ def get_fans_or_followers_ids(user_id, crawl_type, verify_type):
             if max_page > urls_length:
                 max_page = urls_length + 1
         # get ids and store relations
-        user_ids.extend(public.get_fans_or_follows(page, user_id, crawl_type))
+        user_ids.extend(public.get_fans_or_follows(page, user_id, crawl_type, url=url))
 
         cur_page += 1
 

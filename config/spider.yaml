@@ -2,7 +2,7 @@
 time_out: 200                   # timeout for crawling and storing user info
 min_crawl_interal: 10           # min interal of http request
 max_crawl_interal: 20           # max interal of http request
-excp_interal: 5*60              # time for sleeping when crawling raises exceptions
+excp_interal: 300              # time for sleeping when crawling raises exceptions
 
 # TODO set a default value for max_value of crawling
 max_search_page: 50            # max search page for crawling
