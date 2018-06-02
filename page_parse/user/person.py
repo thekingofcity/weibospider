@@ -194,24 +194,26 @@ def get_uid_and_samefollow_by_new_card(html):
     pattern = re.compile(pattern)
     uid = pattern.search(info).groups()[0]
 
-    soup = BeautifulSoup(info, 'html.parser')
-    samefollow_divs = soup.find_all('div', class_='item W_autocut')
-    for div in samefollow_divs:
-        # uid -> r    1
-        # uid is a fan of r
-        relations = list()
-        type = 1
-        n = ""    # from_where    since we can not get this intel from newcard
-        if "TangVision" in div.text:
-            r = 1454338611
-            isDuplicate = UserRelationOper.get_user_by_uid(r, uid, type)
-            if not isDuplicate:
-                relations.append(UserRelation(uid, r, type, n))
-        if "TangVisionGirl" in div.text:
-            r = 3189165860
-            isDuplicate = UserRelationOper.get_user_by_uid(r, uid, type)
-            if not isDuplicate:
-                relations.append(UserRelation(uid, r, type, n))
+    return uid
+
+    # soup = BeautifulSoup(info, 'html.parser')
+    # samefollow_divs = soup.find_all('div', class_='item W_autocut')
+    # for div in samefollow_divs:
+    #     # uid -> r    1
+    #     # uid is a fan of r
+    #     relations = list()
+    #     type = 1
+    #     n = ""    # from_where    since we can not get this intel from newcard
+    #     if "TangVision" in div.text:
+    #         r = 1454338611
+    #         isDuplicate = UserRelationOper.get_user_by_uid(r, uid, type)
+    #         if not isDuplicate:
+    #             relations.append(UserRelation(uid, r, type, n))
+    #     if "TangVisionGirl" in div.text:
+    #         r = 3189165860
+    #         isDuplicate = UserRelationOper.get_user_by_uid(r, uid, type)
+    #         if not isDuplicate:
+    #             relations.append(UserRelation(uid, r, type, n))
         
-        if relations:
-            UserRelationOper.add_all(relations)
+    #     if relations:
+    #         UserRelationOper.add_all(relations)

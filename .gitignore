@@ -9,3 +9,4 @@ config/spider.yaml
 *.pyc
 .cache/
 */.cache/
+first_task_execution/extend_user_first.py

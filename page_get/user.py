@@ -194,10 +194,13 @@ def get_newcard_by_name(user_name):
     """
     user = UserOper.get_user_by_name(user_name)
     if user:
-        return user.uid
-    url = NEWCARD_URL.format(quote(user_name), int(round(time.time() * 1000)))
-    page = get_page(url)
-    person.get_uid_and_samefollow_by_new_card(page)
+        is_crawled = 1
+    else:
+        url = NEWCARD_URL.format(quote(user_name), int(round(time.time() * 1000)))
+        page = get_page(url)
+        uid = person.get_uid_and_samefollow_by_new_card(page)
+        user, is_crawled = get_profile(uid)
+    return user, is_crawled
 
 
 def get_newcard_by_uid(uid):
