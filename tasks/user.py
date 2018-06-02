@@ -63,6 +63,17 @@ def crawl_person_infos(uid):
                       routing_key='for_user_info')
 
 
+def crawl_person_infos_not_in_seed_ids(uid):
+    """
+    Crawl user info not in seed_ids
+    """
+    if not uid:
+        return
+
+    app.send_task('tasks.user.crawl_person_infos', args=(uid, ), queue='user_crawler',
+                    routing_key='for_user_info')
+
+
 @app.task(ignore_result=True)
 def crawl_person_infos_by_name(name):
     """
