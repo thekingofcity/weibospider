@@ -80,9 +80,13 @@ def crawl_person_infos_by_name(name):
     Crawl user info not in seed_ids
     """
     if not name:
-        return
+        return False
 
-    get_newcard_by_name(name)
+    user, is_crawled = get_newcard_by_name(name)
+    if user is None:
+        return False
+    else:
+        return True
 
 
 def execute_user_task():

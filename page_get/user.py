@@ -218,7 +218,11 @@ def get_newcard_by_name(user_name):
     else:
         url = NEWCARD_URL.format(quote(user_name), int(round(time.time() * 1000)))
         page = get_page(url)
+        if page.strip() == '':
+            return None, 0
         uid = person.get_uid_and_samefollow_by_new_card(page)
+        if uid == -1:
+            return None, 0
         user, is_crawled = get_profile(uid)
     return user, is_crawled
 
