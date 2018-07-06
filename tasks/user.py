@@ -31,7 +31,7 @@ def crawl_follower_fans(uid, verify_type):
     # SeedidsOper.set_seed_other_crawled(uid)
 
 
-@app.task(ignore_result=True)
+@app.task(ignore_result=True, acks_late=True)
 def crawl_person_infos(uid):
     """
     Crawl user info and their fans and followers
@@ -100,3 +100,11 @@ def execute_user_task():
 def execute_followers_fans_task(uid, verify_type):
     app.send_task('tasks.user.crawl_follower_fans', args=(uid, verify_type), queue='fans_followers',
                   routing_key='for_fans_followers')
+
+
+def execute_crawl_person_infos_by_name(name):
+    if not name:
+        return False
+    app.send_task('tasks.user.crawl_person_infos_by_name', args=(name,), queue='user_name_crawler',
+                  routing_key='for_user_info')
+
