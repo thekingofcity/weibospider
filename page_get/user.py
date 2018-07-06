@@ -210,7 +210,7 @@ def get_uid_by_name(user_name):
 def get_newcard_by_name(user_name):
     """
     Get user by user_name through newcard method.\n
-    Although it requires login, there should be less chance to get banned since it requests without s.weibo.com
+    Although it still requires login, it is less likely to get banned since it requests without s.weibo.com.
     """
     user = UserOper.get_user_by_name(user_name)
     if user:
@@ -231,7 +231,7 @@ def get_newcard_by_uid(uid):
     """
     ** This function is strongly not recommended if you don't need SAMEFOLLOW **\n
     Get user by uid through newcard method.\n
-    Although it requires login, there should be less chance to get banned since it requests without s.weibo.com.
+    Although it still requires login, it is less likely to get banned since it requests without s.weibo.com.
     """
     user = UserOper.get_user_by_uid(uid)
     if user:
