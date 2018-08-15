@@ -56,12 +56,6 @@ def search_keyword(keyword, keyword_id):
                 # todo: only add seed ids and remove this task
                 app.send_task('tasks.user.crawl_person_infos', args=(wb_data.uid,), queue='user_crawler',
                               routing_key='for_user_info')
-                app.send_task('tasks.comment.crawl_comment_page', args=(wb_data.weibo_id,), queue='comment_crawler',
-                            routing_key='comment_info')
-                app.send_task('tasks.praise.crawl_praise_page', args=(wb_data.weibo_id,), queue='praise_crawler',
-                            routing_key='praise_info')
-                app.send_task('tasks.repost.crawl_repost_page', args=(wb_data.weibo_id, wb_data.uid),
-                            queue='repost_crawler', routing_key='repost_info')
 
 
 @app.task(ignore_result=True)
