@@ -55,7 +55,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
                 os.kill(os.getppid(), signal.SIGTERM)
 
             # There is no difference between http and https address.
-            proxy = {'http': name_cookies[2], 'https': name_cookies[2], }
+            # proxy = {'http': name_cookies[2], 'https': name_cookies[2], }
         else:
             proxy = getip.getIPWithoutLogin('')
             # if proxy['http'] is None:
@@ -63,11 +63,11 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
         
         try:
             if auth_level == 2:
-                resp = requests.get(url, headers=headers, cookies=name_cookies[1], timeout=TIME_OUT, verify=False, proxies=proxy)
+                resp = requests.get(url, headers=headers, cookies=name_cookies[1], timeout=TIME_OUT, verify=False)
             elif auth_level == 1:
-                resp = requests.get(url, headers=headers, cookies=COOKIES, timeout=TIME_OUT, verify=False, proxies=proxy)
+                resp = requests.get(url, headers=headers, cookies=COOKIES, timeout=TIME_OUT, verify=False)
             else:
-                resp = requests.get(url, headers=headers, timeout=TIME_OUT, verify=False, proxies=proxy)
+                resp = requests.get(url, headers=headers, timeout=TIME_OUT, verify=False)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError, AttributeError) as e:
             crawler.warning('Excepitons are raised when crawling {}.Here are details:{}'.format(url, e))
             count += 1
