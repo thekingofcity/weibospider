@@ -82,17 +82,24 @@ def crawl_weibo_datas(uid):
             # here we use local call to get total page number
             total_page = get_total_page(crawl_ajax_page(ajax_url_1, 2))
             auth_level = 1
+
+            if total_page < limit:
+                limit = total_page
+
+            # Since the second ajax of page 1 has been crawled in the code
+            # above and has been stored in databse,
+            # we only have to crawl the first ajax of page 1
+            app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
+                          routing_key='ajax_home_info')
         else:
             auth_level = 2
 
-        if total_page < limit:
-            limit = total_page
+            # Still the same as before
+            app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
+                          routing_key='ajax_home_info')
+            app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_1, auth_level), queue='ajax_home_crawler',
+                          routing_key='ajax_home_info')
 
-        app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
-                      routing_key='ajax_home_info')
-
-        app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_1, auth_level), queue='ajax_home_crawler',
-                      routing_key='ajax_home_info')
         cur_page += 1
 
     SeedidsOper.set_seed_home_crawled(uid)
