@@ -115,7 +115,68 @@ def get_weibo_info_detail(each, html):
         wb_data.praise_num = int(each.find(attrs={'action-type': 'fl_like'}).find_all('em')[1].text)
     except Exception:
         wb_data.praise_num = 0
-    return wb_data, is_all_cont
+
+    try:
+        expand_weibo_dataum = each.find(attrs={'node-type': 'feed_list_forwardContent'})
+        wb_data_forward = WeiboData()
+
+        user_cont = expand_weibo_dataum.find(attrs={'class': 'WB_info'})
+        user_info = str(user_cont.find('a'))
+        user_pattern = 'id=(\\d+)&amp'
+        m = re.search(user_pattern, user_info)
+        if m:
+            wb_data_forward.uid = m.group(1)
+        else:
+            parser.warning("fail to get user'sid, the page source is{}".format(html))
+            return wb_data, is_all_cont
+
+        weibo_pattern = 'mid=(\\d+)'
+        m = re.search(weibo_pattern, str(expand_weibo_dataum.find(attrs={'class': 'WB_func clearfix'})))
+        if m:
+            wb_data_forward.weibo_id = m.group(1)
+        else:
+            parser.warning("fail to get weibo's id,the page source {}".format(html))
+            return wb_data, is_all_cont
+
+        time_url = expand_weibo_dataum.find(attrs={'node-type': 'feed_list_item_date'})
+        wb_data_forward.create_time = time_url.get('title', '')
+        wb_data_forward.weibo_url = time_url.get('href', '')
+        if ROOT_URL not in wb_data_forward.weibo_url:
+            wb_data_forward.weibo_url = '{}://{}{}'.format(PROTOCOL, ROOT_URL, wb_data_forward.weibo_url)
+
+        try:
+            wb_data_forward.weibo_cont = expand_weibo_dataum.find(attrs={'node-type': 'feed_list_reason'}).text.strip()
+        except Exception:
+            wb_data_forward.weibo_cont = ''
+
+        try:
+            wb_data_forward.device = expand_weibo_dataum.find(attrs={'class': 'WB_from S_txt2'}).find(attrs={'action-type': 'app_source'}).text
+        except Exception:
+            wb_data_forward.device = ''
+
+        try:
+            repost_icon = expand_weibo_dataum.find(attrs={'class': 'W_ficon ficon_forward S_ficon'})
+            wb_data_forward.repost_num = int(repost_icon.find_next_siblings("em").text)
+        except Exception:
+            wb_data_forward.repost_num = 0
+        try:
+            comment_icon = expand_weibo_dataum.find(attrs={'class': 'W_ficon ficon_forward S_ficon'})
+            wb_data_forward.comment_num = int(comment_icon.find_next_siblings("em").text)
+        except Exception:
+            wb_data_forward.comment_num = 0
+        try:
+            wb_data_forward.praise_num = int(expand_weibo_dataum.find(attrs={'action-type': 'fl_like'}).find_all('em')[1].text)
+        except Exception:
+            wb_data_forward.praise_num = 0
+
+        print("wb_data_forward: ", wb_data_forward)
+
+        return wb_data, is_all_cont, wb_data_forward
+
+    except Exception:
+        print("no wb_data_forward")
+
+        return wb_data, is_all_cont
 
 
 def get_weibo_list(html):
@@ -137,6 +198,8 @@ def get_weibo_list(html):
                 weibo_cont = status.get_cont_of_weibo(wb_data.weibo_id)
                 wb_data.weibo_cont = weibo_cont if weibo_cont else wb_data.weibo_cont
             weibo_datas.append(wb_data)
+            if len(r) == 3:
+                weibo_datas.append(r[2])
     return weibo_datas
 
 
