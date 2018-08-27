@@ -8,7 +8,7 @@ def getIP(param):
     }
 
 
-def getIPWithoutLogin():
+def getIPWithoutLogin(param):
     return {
         'http': '',
         'https': '',
