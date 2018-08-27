@@ -99,7 +99,10 @@ def get_weibo_info_detail(each, html):
         is_all_cont = 1
 
     try:
-        wb_data.device = each.find(attrs={'class': 'WB_from S_txt2'}).find(attrs={'action-type': 'app_source'}).text
+        try:
+            wb_data.device = each.find(attrs={'class': 'WB_from S_txt2'}).find_all('a')[1].text
+        except Exception:
+            wb_data.device = each.find(attrs={'class': 'WB_from S_txt2'}).find(attrs={'action-type': 'app_source'}).text
     except Exception:
         wb_data.device = ''
 
@@ -112,12 +115,40 @@ def get_weibo_info_detail(each, html):
     except Exception:
         wb_data.comment_num = 0
     try:
-        wb_data.praise_num = int(each.find(attrs={'action-type': 'fl_like'}).find_all('em')[1].text)
+        try:
+            # Since both the origin and forwarded weibo have fl_like
+            # in action-type, we have no choice but to use find_all.
+            # PS: We could find out if this weibo is origin or
+            # forwarded by finding
+            # `each.find_all(attrs={'action-type': 'fl_like'})[1]`
+            # existed or not
+            praise = each.find_all(attrs={'action-type': 'fl_like'})[1].find_all('em')[1].text
+            if '赞' in praise:
+                wb_data.praise_num = 0
+            else:
+                wb_data.praise_num = int(praise)
+        except Exception:
+            praise = each.find_all(attrs={'action-type': 'fl_like'})[0].find_all('em')[1].text
+            if '赞' in praise:
+                wb_data.praise_num = 0
+            else:
+                wb_data.praise_num = int(praise)
     except Exception:
         wb_data.praise_num = 0
 
     try:
         expand_weibo_dataum = each.find(attrs={'node-type': 'feed_list_forwardContent'})
+
+        # the weibo might has been deleted or has premission
+        try:
+            empty_weibo_dataum = expand_weibo_dataum.find(attrs={'class': 'WB_empty'})
+        except Exception:
+            pass
+        if empty_weibo_dataum:
+            wb_data.is_origin = 0
+            wb_data.origin_weibo_id = "0"
+            return wb_data, is_all_cont
+
         wb_data_forward = WeiboData()
 
         user_cont = expand_weibo_dataum.find(attrs={'class': 'WB_info'})
@@ -138,6 +169,13 @@ def get_weibo_info_detail(each, html):
             parser.warning("fail to get weibo's id,the page source {}".format(html))
             return wb_data, is_all_cont
 
+        wb_data.is_origin = 0
+        wb_data.origin_weibo_id = m.group(1)
+
+        # Not implemented these yet
+        wb_data_forward.weibo_img = ''
+        wb_data_forward.weibo_video = ''
+
         time_url = expand_weibo_dataum.find(attrs={'node-type': 'feed_list_item_date'})
         wb_data_forward.create_time = time_url.get('title', '')
         wb_data_forward.weibo_url = time_url.get('href', '')
@@ -155,27 +193,33 @@ def get_weibo_info_detail(each, html):
             wb_data_forward.device = ''
 
         try:
-            repost_icon = expand_weibo_dataum.find(attrs={'class': 'W_ficon ficon_forward S_ficon'})
-            wb_data_forward.repost_num = int(repost_icon.find_next_siblings("em").text)
+            handle = expand_weibo_dataum.find(attrs={'class': 'WB_func clearfix'}).find_all("em")
+            # use this line to debug num
+            print(handle)
         except Exception:
             wb_data_forward.repost_num = 0
-        try:
-            comment_icon = expand_weibo_dataum.find(attrs={'class': 'W_ficon ficon_forward S_ficon'})
-            wb_data_forward.comment_num = int(comment_icon.find_next_siblings("em").text)
-        except Exception:
             wb_data_forward.comment_num = 0
-        try:
-            wb_data_forward.praise_num = int(expand_weibo_dataum.find(attrs={'action-type': 'fl_like'}).find_all('em')[1].text)
-        except Exception:
             wb_data_forward.praise_num = 0
-
-        print("wb_data_forward: ", wb_data_forward)
+        else:
+            try:
+                wb_data_forward.repost_num = int(handle[1].text)
+            except Exception:
+                wb_data_forward.repost_num = 0
+            try:
+                # comment_icon = expand_weibo_dataum.find(attrs={'class': 'W_ficon ficon_repeat S_ficon'})
+                # wb_data_forward.comment_num = int(comment_icon.find_next_siblings("em").text)
+                wb_data_forward.comment_num = int(handle[3].text)
+            except Exception:
+                wb_data_forward.comment_num = 0
+            try:
+                # wb_data_forward.praise_num = int(expand_weibo_dataum.find(attrs={'action-type': 'fl_like'}).find_all('em')[1].text)
+                wb_data_forward.praise_num = int(handle[5].text)
+            except Exception:
+                wb_data_forward.praise_num = 0
 
         return wb_data, is_all_cont, wb_data_forward
 
     except Exception:
-        print("no wb_data_forward")
-
         return wb_data, is_all_cont
 
 

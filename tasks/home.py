@@ -12,10 +12,14 @@ from page_parse.home import (
 
 
 # only crawls origin weibo
-HOME_URL = 'http://weibo.com/u/{}?is_ori=1&is_tag=0&profile_ftype=1&page={}'
+# HOME_URL = 'http://weibo.com/u/{}?is_ori=1&is_tag=0&profile_ftype=1&page={}'
+# AJAX_URL = 'http://weibo.com/p/aj/v6/mblog/mbloglist?ajwvr=6&domain={}&pagebar={}&is_ori=1&id={}{}&page={}' \
+#            '&pre_page={}&__rnd={}'
+
+# crawls all weibo
 HOME_URL = 'http://weibo.com/u/{}?is_all=1&page={}'
-AJAX_URL = 'http://weibo.com/p/aj/v6/mblog/mbloglist?ajwvr=6&domain={}&pagebar={}&is_ori=1&id={}{}&page={}' \
-           '&pre_page={}&__rnd={}'
+AJAX_URL = 'http://weibo.com/p/aj/v6/mblog/mbloglist?ajwvr=6&domain={}&wvr=6&is_all=1&pagebar={}&id={}{}' \
+           '&feed_type=0&page={}&pre_page={}&__rnd={}'
 
 
 def determine(weibo_datum, timeafter):
@@ -82,28 +86,38 @@ def crawl_weibo_datas(uid):
         if len(weibo_data) != original_length_weibo_data:
             break
 
-        return
-
-        domain = public.get_userdomain(html)
-        cur_time = int(time.time()*1000)
-        ajax_url_0 = AJAX_URL.format(domain, 0, domain, uid, cur_page, cur_page, cur_time)
-        ajax_url_1 = AJAX_URL.format(domain, 1, domain, uid, cur_page, cur_page, cur_time+100)
-
         if cur_page == 1:
-            # here we use local call to get total page number
-            total_page = get_total_page(crawl_ajax_page(ajax_url_1, 2))
             auth_level = 1
+            auth_level = 2
+
+            domain = public.get_userdomain(html)
+            cur_time = int(time.time()*1000)
+            ajax_url_0 = AJAX_URL.format(domain, 0, domain, uid, cur_page, cur_page, cur_time)
+            ajax_url_1 = AJAX_URL.format(domain, 1, domain, uid, cur_page, cur_page, cur_time + 100)
+
+            # local call to simulate human interaction
+            # crawl_ajax_page(ajax_url_0, auth_level)
+
+            # here we use local call to get total page number
+            total_page = get_total_page(crawl_ajax_page(ajax_url_1, auth_level))
 
             if total_page < limit:
                 limit = total_page
 
-            # Since the second ajax of page 1 has already been crawled
-            # in the code above and has been stored in databse,
-            # we only have to crawl the first ajax of page 1
-            app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
-                          routing_key='ajax_home_info')
+            # # Since the second ajax of page 1 has already been crawled
+            # # in the code above and has been stored in databse,
+            # # we only have to crawl the first ajax of page 1
+            # app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
+            #               routing_key='ajax_home_info')
+            return
+
         else:
             auth_level = 2
+
+            domain = public.get_userdomain(html)
+            cur_time = int(time.time()*1000)
+            ajax_url_0 = AJAX_URL.format(domain, 0, domain, uid, cur_page, cur_page - 1, cur_time)
+            ajax_url_1 = AJAX_URL.format(domain, 1, domain, uid, cur_page, cur_page - 1, cur_time+100)
 
             # Still the same as before
             app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
