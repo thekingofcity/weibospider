@@ -9,6 +9,10 @@ def getIP(param):
 
 
 def getIPWithoutLogin():
+    return {
+        'http': '',
+        'https': '',
+    }
     apiUrl = ""
     res = requests.get(apiUrl).content.decode()
     ips = res.split('\n')
