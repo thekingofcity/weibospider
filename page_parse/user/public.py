@@ -59,7 +59,12 @@ def get_verifyreason(html, verify_type):
     """
     if verify_type == 1 or verify_type == 2:
         soup = BeautifulSoup(_get_header(html), 'html.parser')
-        return soup.find(attrs={'class': 'pf_intro'})['title']
+        try:
+            ret = soup.find(attrs={'class': 'pf_intro'})['title']
+        except Exception:
+            return ''
+        else:
+            return ret
     else:
         return ''
 
