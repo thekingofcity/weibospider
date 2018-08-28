@@ -61,7 +61,8 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
             proxy = getip.getIPWithoutLogin('')
             if proxy[1]:
                 proxy = proxy[0]
-                crawler.info('the proxy is ' + json.dumps(proxy['http']))
+                if proxy['http']:
+                    crawler.info('the proxy is ' + json.dumps(proxy['http']))
             else:
                 crawler.warning('No more proxy available')
                 os.kill(os.getppid(), signal.SIGTERM)
