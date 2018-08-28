@@ -59,7 +59,12 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
             # proxy = {'http': name_cookies[2], 'https': name_cookies[2], }
         else:
             proxy = getip.getIPWithoutLogin('')
-            crawler.info('the proxy is ' + json.dumps(proxy['http']))
+            if proxy[1]:
+                proxy = proxy[0]
+                crawler.info('the proxy is ' + json.dumps(proxy['http']))
+            else:
+                crawler.warning('No more proxy available')
+                os.kill(os.getppid(), signal.SIGTERM)
             # if proxy['http'] is None:
             #     crawler.warning('No available ip in ip pools. Using local ip instead.')
         
@@ -73,7 +78,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError, AttributeError) as e:
             crawler.warning('Excepitons are raised when crawling {}.Here are details:{}'.format(url, e))
             count += 1
-            time.sleep(int(EXCP_INTERAL))
+            time.sleep(eval(EXCP_INTERAL))
             continue
 
         if resp.status_code == 414:
