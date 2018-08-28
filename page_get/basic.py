@@ -20,7 +20,7 @@ from config import (
     get_timeout, get_crawl_interal, get_excp_interal, get_max_retries)
 
 
-TIME_OUT = get_timeout()
+TIME_OUT = int(get_timeout())
 INTERAL = get_crawl_interal()
 MAX_RETRIES = get_max_retries()
 EXCP_INTERAL = get_excp_interal()

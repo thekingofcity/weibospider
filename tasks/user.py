@@ -1,10 +1,10 @@
-from .workers import app
+from celery.exceptions import SoftTimeLimitExceededfrom .workers import app
+
 from db.dao import (
     UserOper, SeedidsOper)
 from page_get.user import (get_fans_or_followers_ids, get_profile, get_user_profile,
                       get_newcard_by_name)
 from logger import crawler
-from celery.exceptions import SoftTimeLimitExceeded
 
 
 @app.task(ignore_result=True)

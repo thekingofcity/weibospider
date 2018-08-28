@@ -1,3 +1,5 @@
+from celery.exceptions import SoftTimeLimitExceeded
+
 from .workers import app
 from page_parse import comment
 from config import conf
