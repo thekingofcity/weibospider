@@ -82,11 +82,31 @@ def crawl_weibo_datas(uid):
             if determine(weibo_datum, timeafter)
         ]
 
+        # for weibo_datum in weibo_data:
+        #     print(weibo_datum.weibo_id)
+        #     print(weibo_datum.weibo_cont)
+        #     print("weibo_img",weibo_datum.weibo_img)
+        #     print("weibo_video",weibo_datum.weibo_video)
+        #     print("weibo_img_path",weibo_datum.weibo_img_path)
+        #     print(weibo_datum.repost_num)
+        #     print(weibo_datum.comment_num)
+        #     print(weibo_datum.praise_num)
+        #     print(weibo_datum.uid)
+        #     print(weibo_datum.is_origin)
+        #     print(weibo_datum.origin_weibo_id)
+        #     print(weibo_datum.device)
+        #     print(weibo_datum.create_time)
+        #     try:
+        #         WbDataOper.add_one(weibo_datum)
+        #     except Exception as e:
+        #         print(e)
         WbDataOper.add_all(weibo_data)
 
-        # If the weibo isn't created after the given time, jump out the loop
-        if len(weibo_data) != original_length_weibo_data:
-            break
+        # the forwarded weibo might interfere with the origin weibo
+        # # If the weibo isn't created after the given time, jump out the loop
+        # if len(weibo_data) != original_length_weibo_data:
+        #     print(len(weibo_data), original_length_weibo_data)
+        #     break
 
         if cur_page == 1:
             auth_level = 1
@@ -98,7 +118,7 @@ def crawl_weibo_datas(uid):
             ajax_url_1 = AJAX_URL.format(domain, 1, domain, uid, cur_page, cur_page, cur_time + 100)
 
             # local call to simulate human interaction
-            # crawl_ajax_page(ajax_url_0, auth_level)
+            crawl_ajax_page(ajax_url_0, auth_level)
 
             # here we use local call to get total page number
             total_page = get_total_page(crawl_ajax_page(ajax_url_1, auth_level))
@@ -111,6 +131,7 @@ def crawl_weibo_datas(uid):
             # # we only have to crawl the first ajax of page 1
             # app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
             #               routing_key='ajax_home_info')
+            return
 
         else:
             auth_level = 2

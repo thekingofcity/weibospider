@@ -172,9 +172,12 @@ def get_weibo_info_detail(each, html):
         wb_data.is_origin = 0
         wb_data.origin_weibo_id = m.group(1)
 
-        # Not implemented these yet
-        wb_data_forward.weibo_img = ''
-        wb_data_forward.weibo_video = ''
+        # Since the origin weibo can't have img/video
+        # So we move origin's img/video to the forwarded
+        wb_data.weibo_img = ''
+        wb_data.weibo_video = ''
+        wb_data_forward.weibo_img = wb_data.weibo_img
+        wb_data_forward.weibo_video = wb_data.weibo_video
 
         time_url = expand_weibo_dataum.find(attrs={'node-type': 'feed_list_item_date'})
         wb_data_forward.create_time = time_url.get('title', '')
@@ -195,7 +198,7 @@ def get_weibo_info_detail(each, html):
         try:
             handle = expand_weibo_dataum.find(attrs={'class': 'WB_func clearfix'}).find_all("em")
             # use this line to debug num
-            print(handle)
+            # print(handle)
         except Exception:
             wb_data_forward.repost_num = 0
             wb_data_forward.comment_num = 0

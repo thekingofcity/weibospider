@@ -16,6 +16,11 @@ def getIP(param: None) -> Dict:
 
 def getIPWithoutLogin(param: None) -> Tuple[Dict, bool]:
     apiUrl = get_proxy_url()
+    if not apiUrl:
+        return {
+            'http': '',
+            'https': '',
+        }, True
     ip = "too many requests"
     i = 0
     while ("too many requests" in ip) and (i < max_retreis):
