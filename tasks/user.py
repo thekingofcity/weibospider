@@ -1,4 +1,4 @@
-from celery.exceptions import SoftTimeLimitExceededfrom
+from celery.exceptions import SoftTimeLimitExceeded
 
 from .workers import app
 from db.dao import (
