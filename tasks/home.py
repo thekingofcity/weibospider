@@ -153,7 +153,7 @@ def crawl_weibo_datas(uid):
 
 
 def execute_home_task(uid: str = None):
-    if not str:
+    if not uid:
         # you can have many strategies to crawl user's home page, here we choose table seed_ids's uid
         # whose home_crawl is 0
         id_objs = SeedidsOper.get_home_ids()

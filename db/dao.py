@@ -170,6 +170,10 @@ class UserRelationOper(CommonOper):
 
 class WbDataOper(CommonOper):
     @classmethod
+    def get_wb_by_uid(cls, uid):
+        return db_session.query(WeiboData).filter(WeiboData.uid == uid).all()
+
+    @classmethod
     def get_wb_by_mid(cls, mid):
         return db_session.query(WeiboData).filter(WeiboData.weibo_id == mid).first()
 
