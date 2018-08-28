@@ -30,6 +30,14 @@ def crawl_comment_by_page(mid, page_num):
     CommentOper.add_all(comment_data)
     # if page_num == 1:
     #     WbDataOper.set_weibo_comment_crawled(mid)
+
+    for comment_datum in comment_data:
+        app.send_task(
+            'tasks.user.crawl_person_infos',
+            args=(comment_datum.user_id, ),
+            queue='user_crawler',
+            routing_key='for_user_info')
+
     if len(comment_data) != origin_comment_data_len:
         need_more_comment_crawler = False
     else:
