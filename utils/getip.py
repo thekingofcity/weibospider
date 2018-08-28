@@ -29,6 +29,11 @@ def getIPWithoutLogin(param: None) -> Tuple[Dict, bool]:
         ip = ips[0]
         i = i + 1
 
+    if "充值续费" in ip:
+        return {
+            'http': '',
+            'https': '',
+        }, False
     ret = {
         'http': 'http://' + ip,
         'https': 'https://' + ip,
