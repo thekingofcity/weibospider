@@ -1,6 +1,7 @@
 import os
 import time
 import signal
+import json
 
 import requests
 
@@ -58,6 +59,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
             # proxy = {'http': name_cookies[2], 'https': name_cookies[2], }
         else:
             proxy = getip.getIPWithoutLogin('')
+            crawler.info('the proxy is ' + json.dumps(proxy['http']))
             # if proxy['http'] is None:
             #     crawler.warning('No available ip in ip pools. Using local ip instead.')
         
@@ -65,9 +67,9 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
             if auth_level == 2:
                 resp = requests.get(url, headers=headers, cookies=name_cookies[1], timeout=TIME_OUT, verify=False)
             elif auth_level == 1:
-                resp = requests.get(url, headers=headers, cookies=COOKIES, timeout=TIME_OUT, verify=False)
+                resp = requests.get(url, headers=headers, cookies=COOKIES, timeout=TIME_OUT, verify=False, proxies=proxy)
             else:
-                resp = requests.get(url, headers=headers, timeout=TIME_OUT, verify=False)
+                resp = requests.get(url, headers=headers, timeout=TIME_OUT, verify=False, proxies=proxy)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError, AttributeError) as e:
             crawler.warning('Excepitons are raised when crawling {}.Here are details:{}'.format(url, e))
             count += 1

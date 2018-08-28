@@ -125,5 +125,10 @@ def get_images_type():
 def get_time_after():
     return cf.get('time_after')
 
+
 def get_samefollow_uid():
     return cf.get('samefollow_uid')
+
+
+def get_proxy_url():
+    return cf.get('proxy_url')

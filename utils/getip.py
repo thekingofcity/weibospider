@@ -1,6 +1,9 @@
 import requests
 
 
+from config import get_proxy_url
+
+
 def getIP(param):
     return {
         'http': '',
@@ -9,11 +12,7 @@ def getIP(param):
 
 
 def getIPWithoutLogin(param):
-    return {
-        'http': '',
-        'https': '',
-    }
-    apiUrl = ""
+    apiUrl = get_proxy_url()
     res = requests.get(apiUrl).content.decode()
     ips = res.split('\n')
     ip = ips[0]
