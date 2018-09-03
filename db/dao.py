@@ -240,7 +240,7 @@ class PraiseOper(CommonOper):
     @classmethod
     def get_Praise_by_realtionship(cls, mid, user_id):
         return db_session.query(WeiboPraise).filter_by(
-            WeiboPraise.weibo_id=mid, WeiboPraise.user_id=user_id).first()
+            weibo_id=mid, user_id=user_id).first()
 
 
 class RepostOper(CommonOper):
