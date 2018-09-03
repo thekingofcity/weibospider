@@ -58,8 +58,17 @@ def crawl_praise_page(mid):
                       routing_key='praise_page_info')
 
 
-def execute_praise_task():
-    weibo_datas = WbDataOper.get_weibo_praise_not_crawled()
-    for weibo_data in weibo_datas:
-        app.send_task('tasks.praise.crawl_praise_page', args=(weibo_data.weibo_id,), queue='praise_crawler',
-                      routing_key='praise_info')
+def execute_praise_task(uid: str = None):
+    if not uid:
+        weibo_datas = WbDataOper.get_weibo_praise_not_crawled()
+        for weibo_data in weibo_datas:
+            app.send_task('tasks.praise.crawl_praise_page', args=(weibo_data.weibo_id,), queue='praise_crawler',
+                        routing_key='praise_info')
+    else:
+        weibo_data = WbDataOper.get_wb_by_uid(uid)
+        for weibo_datum in weibo_data:
+            app.send_task(
+                'tasks.comment.crawl_comment_page',
+                args=(weibo_datum.weibo_id, ),
+                queue='comment_crawler',
+                routing_key='comment_info')
