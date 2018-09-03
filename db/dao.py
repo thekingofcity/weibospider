@@ -165,7 +165,7 @@ class UserRelationOper(CommonOper):
         if user:
             return True
         else:
-            return False 
+            return False
 
 
 class WbDataOper(CommonOper):
@@ -231,10 +231,17 @@ class CommentOper(CommonOper):
     def get_comment_by_id(cls, cid):
         return db_session.query(WeiboComment).filter(WeiboComment.comment_id == cid).first()
 
+
 class PraiseOper(CommonOper):
     @classmethod
     def get_Praise_by_id(cls, pid):
         return db_session.query(WeiboPraise).filter(WeiboPraise.weibo_id == pid).first()
+
+    @classmethod
+    def get_Praise_by_realtionship(cls, mid, user_id):
+        return db_session.query(WeiboPraise).filter_by(
+            WeiboPraise.weibo_id=mid, WeiboPraise.user_id=user_id).first()
+
 
 class RepostOper(CommonOper):
     @classmethod
