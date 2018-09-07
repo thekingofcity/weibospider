@@ -82,25 +82,25 @@ def crawl_weibo_datas(uid):
             if determine(weibo_datum, timeafter)
         ]
 
-        # for weibo_datum in weibo_data:
-        #     print(weibo_datum.weibo_id)
-        #     print(weibo_datum.weibo_cont)
-        #     print("weibo_img",weibo_datum.weibo_img)
-        #     print("weibo_video",weibo_datum.weibo_video)
-        #     print("weibo_img_path",weibo_datum.weibo_img_path)
-        #     print(weibo_datum.repost_num)
-        #     print(weibo_datum.comment_num)
-        #     print(weibo_datum.praise_num)
-        #     print(weibo_datum.uid)
-        #     print(weibo_datum.is_origin)
-        #     print(weibo_datum.origin_weibo_id)
-        #     print(weibo_datum.device)
-        #     print(weibo_datum.create_time)
-        #     try:
-        #         WbDataOper.add_one(weibo_datum)
-        #     except Exception as e:
-        #         print(e)
-        WbDataOper.add_all(weibo_data)
+        for weibo_datum in weibo_data:
+            try:
+                WbDataOper.add_one(weibo_datum)
+            except Exception as e:
+                print(weibo_datum.weibo_id)
+                print(weibo_datum.weibo_cont)
+                print("weibo_img",weibo_datum.weibo_img)
+                print("weibo_video",weibo_datum.weibo_video)
+                print("weibo_img_path",weibo_datum.weibo_img_path)
+                print(weibo_datum.repost_num)
+                print(weibo_datum.comment_num)
+                print(weibo_datum.praise_num)
+                print(weibo_datum.uid)
+                print(weibo_datum.is_origin)
+                print(weibo_datum.origin_weibo_id)
+                print(weibo_datum.device)
+                print(weibo_datum.create_time)
+                print(e)
+        # WbDataOper.add_all(weibo_data)
 
         # the forwarded weibo might interfere with the origin weibo
         # # If the weibo isn't created after the given time, jump out the loop
@@ -131,7 +131,7 @@ def crawl_weibo_datas(uid):
             # # we only have to crawl the first ajax of page 1
             # app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
             #               routing_key='ajax_home_info')
-            return
+            # return
 
         else:
             auth_level = 2
@@ -146,6 +146,9 @@ def crawl_weibo_datas(uid):
                           routing_key='ajax_home_info')
             app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_1, auth_level), queue='ajax_home_crawler',
                           routing_key='ajax_home_info')
+
+            if cur_page == 3:
+                return
 
         cur_page += 1
 

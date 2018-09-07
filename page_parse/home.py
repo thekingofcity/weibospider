@@ -174,10 +174,10 @@ def get_weibo_info_detail(each, html):
 
         # Since the origin weibo can't have img/video
         # So we move origin's img/video to the forwarded
-        wb_data.weibo_img = ''
-        wb_data.weibo_video = ''
         wb_data_forward.weibo_img = wb_data.weibo_img
         wb_data_forward.weibo_video = wb_data.weibo_video
+        wb_data.weibo_img = ''
+        wb_data.weibo_video = ''
 
         time_url = expand_weibo_dataum.find(attrs={'node-type': 'feed_list_item_date'})
         wb_data_forward.create_time = time_url.get('title', '')
@@ -258,7 +258,11 @@ def get_max_num(html):
     :return:
     """
     soup = BeautifulSoup(html, "html.parser")
-    href_list = soup.find(attrs={'action-type': 'feed_list_page_morelist'}).find_all('a')
+    try:
+        href_list = soup.find(attrs={'action-type': 'feed_list_page_morelist'}).find_all('a')
+    except Exception:
+        # The user has only one page
+        return 1
     return len(href_list)
 
 

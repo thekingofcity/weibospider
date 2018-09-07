@@ -231,6 +231,11 @@ class CommentOper(CommonOper):
     def get_comment_by_id(cls, cid):
         return db_session.query(WeiboComment).filter(WeiboComment.comment_id == cid).first()
 
+    @classmethod
+    def get_comment_by_id_mid(cls, cid, weibo_id):
+        return db_session.query(WeiboComment).filter_by(
+            comment_id=cid, weibo_id=weibo_id).first()
+
 
 class PraiseOper(CommonOper):
     @classmethod
@@ -238,9 +243,9 @@ class PraiseOper(CommonOper):
         return db_session.query(WeiboPraise).filter(WeiboPraise.weibo_id == pid).first()
 
     @classmethod
-    def get_Praise_by_realtionship(cls, mid, user_id):
+    def get_Praise_by_realtionship(cls, weibo_id, user_id):
         return db_session.query(WeiboPraise).filter_by(
-            weibo_id=mid, user_id=user_id).first()
+            weibo_id=weibo_id, user_id=user_id).first()
 
 
 class RepostOper(CommonOper):

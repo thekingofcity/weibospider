@@ -12,7 +12,7 @@ BASE_URL = 'http://weibo.com/aj/v6/comment/big?ajwvr=6&id={}&page={}'
 
 
 def determine(comment_datum):
-    if CommentOper.get_comment_by_id(comment_datum.comment_id):
+    if CommentOper.get_comment_by_id_mid(comment_datum.comment_id, comment_datum.weibo_id):
         return False
     return True
 

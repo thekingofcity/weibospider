@@ -12,7 +12,7 @@ BASE_URL = 'http://weibo.com/aj/v6/like/big?ajwvr=6&mid={}&page={}&__rnd={}'
 
 
 def determine(praise_datum):
-    if PraiseOper.get_Praise_by_realtionship(praise_datum.mid,
+    if PraiseOper.get_Praise_by_realtionship(praise_datum.weibo_id,
                                              praise_datum.user_id):
         return False
     return True
