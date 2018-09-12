@@ -93,8 +93,8 @@ def crawl_person_infos_by_name(name):
 def execute_user_task(uid):
     if not uid:
         return
-    app.send_task('tasks.user.crawl_person_infos', args=(seed.uid,), queue='user_crawler',
-                    routing_key='for_user_info')
+    app.send_task('tasks.user.crawl_person_infos', args=(uid,), queue='user_crawler',
+                  routing_key='for_user_info')
 
 
 def execute_followers_fans_task(uid, verify_type):
