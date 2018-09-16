@@ -161,7 +161,7 @@ class UserOper(CommonOper):
 class UserRelationOper(CommonOper):
     @classmethod
     def get_user_by_uid(cls, uid, other_id, type):
-        user = db_session.query(UserRelation).filter_by(user_id = uid, follow_or_fans_id = other_id).first()
+        user = db_session.query(UserRelation.id).filter_by(user_id = uid, follow_or_fans_id = other_id).first()
         if user:
             return True
         else:
