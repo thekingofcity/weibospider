@@ -176,6 +176,9 @@ def get_fans_or_follows(html, uid, type, url = None):
     soup = BeautifulSoup(html, "html.parser")
     scripts = soup.find_all('script')
 
+    isDuplicateFlag = False  # flag indicating already crawled element/page
+                             # which can save redundant request times
+
     user_ids = list()
     relations = list()
     for script in scripts:
@@ -205,10 +208,12 @@ def get_fans_or_follows(html, uid, type, url = None):
                                 n = ""
                             user_ids.append(r)
                             relations.append(UserRelation(uid, r, type, n))
+                        else:
+                            isDuplicateFlag = True
             break
 
     UserRelationOper.add_all(relations)
-    return user_ids
+    return user_ids, isDuplicateFlag
 
 
 def get_max_crawl_pages(html):

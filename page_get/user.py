@@ -180,9 +180,13 @@ def get_fans_or_followers_ids(user_id, crawl_type, verify_type):
             if max_page > urls_length:
                 max_page = urls_length + 1
         # get ids and store relations
-        user_ids.extend(public.get_fans_or_follows(page, user_id, crawl_type, url=url))
+        user_ids_tmp, isDuplicateFlag = public.get_fans_or_follows(page, user_id, crawl_type, url=url)
+        user_ids.extend(user_ids_tmp)
 
-        cur_page += 1
+        if not isDuplicateFlag:
+            cur_page += 1
+        else:
+            break
 
     return user_ids
 
