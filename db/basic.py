@@ -13,7 +13,7 @@ def get_engine():
     password = os.getenv('DB_PASS', args['password'])
     connect_str = "{}+pymysql://{}:{}@{}:{}/{}?charset=utf8mb4".format(args['db_type'], args['user'], password,
                                                              args['host'], args['port'], args['db_name'])
-    engine = create_engine(connect_str, encoding='utf-8')
+    engine = create_engine(connect_str, encoding='UTF8MB4')
     return engine
 
 
