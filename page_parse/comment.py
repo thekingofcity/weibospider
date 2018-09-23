@@ -83,7 +83,7 @@ def get_create_time_from_text(create_time_str: str) -> datetime:
             create_time = get_create_time_from_text_default_error_handler()
         else:
             create_time = (datetime.datetime.now() + datetime.timedelta(
-                minutes=-create_time_minute)).strftime("%Y-%m-%d %H:%M:%S")
+                minutes=-create_time_minute))
     elif '今天' in create_time_str:
         # 今天 22:11/今天 21:44/今天 05:11
         create_time = create_time_str.split()
