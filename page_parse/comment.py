@@ -1,4 +1,7 @@
 import json
+import time
+import datetime
+import re
 
 from bs4 import BeautifulSoup
 
@@ -51,6 +54,66 @@ def get_next_url(html):
     return url
 
 
+def get_create_time_from_text_default_error_handler() -> datetime:
+    """[default error handler will return datetime of now]
+    
+    Returns:
+        datetime -- [description]
+    """
+
+    return datetime.datetime.now()
+
+
+def get_create_time_from_text(create_time_str: str) -> datetime:
+    """[Get create time from text]
+    
+    Arguments:
+        create_time_str {str} -- [create time str]
+    
+    Returns:
+        datetime -- [create time]
+    """
+
+    if '分钟前' in create_time_str:
+        # 2分钟前/12分钟前/55分钟前
+        create_time_minute = re.sub(r"\D", "", create_time_str)  # 10分钟前 -> 10
+        try:
+            create_time_minute = int(create_time_minute)
+        except ValueError:
+            create_time = get_create_time_from_text_default_error_handler()
+        else:
+            create_time = (datetime.datetime.now() + datetime.timedelta(
+                minutes=-create_time_minute))
+    elif '今天' in create_time_str:
+        # 今天 22:11/今天 21:44/今天 05:11
+        create_time = create_time.split()
+        if len(create_time) == 2:
+            create_time = datetime.datetime.now().strftime("%Y-%m-%d %H:") + create_time[1]
+            try:
+                datetime.datetime.strptime(create_time, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                create_time = get_create_time_from_text_default_error_handler()
+        else:
+            create_time = get_create_time_from_text_default_error_handler()
+    elif '月' in create_time_str:
+        # 9月21日 14:05/9月21日 03:07/9月20日 22:20/1月5日 08:39
+        try:
+            create_time = datetime.datetime.strptime(create_time_str, "%m月%d日 %H:%M")
+        except ValueError:
+            create_time = get_create_time_from_text_default_error_handler()
+        else:
+            # the year of create_time will be 1900 (default value)
+            year = int(datetime.datetime.now().strftime("%Y"))
+            create_time.replace(year=year)
+    else:
+        # 2017-12-29 10:48/2017-12-28 10:15
+        try:
+            create_time = datetime.datetime.strptime(create_time_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            create_time = get_create_time_from_text_default_error_handler()
+    return create_time
+
+
 @parse_decorator([])
 def get_comment_list(html, wb_id):
     """
@@ -74,8 +137,12 @@ def get_comment_list(html, wb_id):
             wb_comment.comment_id = comment['comment_id']
             # TODO 将wb_comment.user_id加入待爬队列（seed_ids）
             wb_comment.user_id = comment.find(attrs={'class': 'WB_text'}).find('a').get('usercard')[3:]
-            # todo 日期格式化
-            wb_comment.create_time = comment.find(attrs={'class': 'WB_from S_txt2'}).text
+
+            create_time = comment.find(attrs={'class': 'WB_from S_txt2'}).text
+            create_time = get_create_time_from_text(create_time)
+            create_time = create_time.strftime("%Y-%m-%d %H:%M:%S")
+            wb_comment.create_time = create_time
+
             wb_comment.weibo_id = wb_id
         except Exception as e:
             parser.error('解析评论失败，具体信息是{}'.format(e))

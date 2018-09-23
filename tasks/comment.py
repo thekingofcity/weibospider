@@ -56,6 +56,8 @@ def crawl_comment_page(mid):
     if total_page < limit:
         limit = total_page + 1
 
+    return
+
     if ret[2]:
         for page_num in range(2, limit):
             app.send_task('tasks.comment.crawl_comment_by_page', args=(mid, page_num), queue='comment_page_crawler',

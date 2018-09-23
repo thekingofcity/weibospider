@@ -85,9 +85,9 @@ weibo_comment = Table('weibo_comment', metadata,
                       Column("id", INTEGER, primary_key=True, autoincrement=True),
                       Column("comment_id", String(50), unique=True),
                       Column("comment_cont", Text),
-                      Column("weibo_id", String(200)),
+                      Column("weibo_id", String(20)),
                       Column("user_id", String(20)),
-                      Column("create_time", String(200)),
+                      Column("create_time", DateTime),
                       )
 
 # praise table
