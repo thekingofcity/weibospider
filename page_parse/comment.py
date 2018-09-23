@@ -78,6 +78,7 @@ def get_create_time_from_text(create_time_str: str) -> datetime:
         datetime -- [create time]
     """
 
+    create_time_str = re.sub(r"\u7b2c[0-9]+\u697c", "", create_time_str)  # 第XX楼
     create_time_str = create_time_str.strip()
     if '分钟前' in create_time_str:
         # 2分钟前/12分钟前/55分钟前
