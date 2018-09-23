@@ -1,5 +1,4 @@
 import json
-import time
 import datetime
 import re
 
@@ -54,13 +53,18 @@ def get_next_url(html):
     return url
 
 
-def get_create_time_from_text_default_error_handler() -> datetime:
+def get_create_time_from_text_default_error_handler(create_time_str:str, e: Exception) -> datetime:
     """[default error handler will return datetime of now]
     
+    Arguments:
+        create_time_str {str} -- [origin str]
+        e {Exception} -- [Exception]
+    
     Returns:
-        datetime -- [description]
+        datetime -- [datetime of now]
     """
 
+    parser.error('解析评论时间失败，原时间为"{}"，具体信息是{}'.format(create_time_str, e))
     return datetime.datetime.now()
 
 
@@ -74,13 +78,14 @@ def get_create_time_from_text(create_time_str: str) -> datetime:
         datetime -- [create time]
     """
 
+    create_time_str = create_time_str.strip()
     if '分钟前' in create_time_str:
         # 2分钟前/12分钟前/55分钟前
         create_time_minute = re.sub(r"\D", "", create_time_str)  # 10分钟前 -> 10
         try:
             create_time_minute = int(create_time_minute)
-        except ValueError:
-            create_time = get_create_time_from_text_default_error_handler()
+        except ValueError as e:
+            create_time = get_create_time_from_text_default_error_handler(create_time_str, e)
         else:
             create_time = (datetime.datetime.now() + datetime.timedelta(
                 minutes=-create_time_minute))
@@ -91,16 +96,16 @@ def get_create_time_from_text(create_time_str: str) -> datetime:
             create_time = datetime.datetime.now().strftime("%Y-%m-%d ") + create_time[1] + ":00"
             try:
                 create_time = datetime.datetime.strptime(create_time, "%Y-%m-%d %H:%M:%S")
-            except ValueError:
-                create_time = get_create_time_from_text_default_error_handler()
+            except ValueError as e:
+                create_time = get_create_time_from_text_default_error_handler(create_time_str, e)
         else:
-            create_time = get_create_time_from_text_default_error_handler()
+            create_time = get_create_time_from_text_default_error_handler(create_time_str, e)
     elif '月' in create_time_str:
         # 9月21日 14:05/9月21日 03:07/9月20日 22:20/1月5日 08:39
         try:
             create_time = datetime.datetime.strptime(create_time_str, "%m月%d日 %H:%M")
-        except ValueError:
-            create_time = get_create_time_from_text_default_error_handler()
+        except ValueError as e:
+            create_time = get_create_time_from_text_default_error_handler(create_time_str, e)
         else:
             # the year of create_time will be 1900 (default value)
             year = int(datetime.datetime.now().strftime("%Y"))
@@ -110,8 +115,8 @@ def get_create_time_from_text(create_time_str: str) -> datetime:
         # 2017-12-29 10:48/2017-12-28 10:15
         try:
             create_time = datetime.datetime.strptime(create_time_str, "%Y-%m-%d %H:%M")
-        except ValueError:
-            create_time = get_create_time_from_text_default_error_handler()
+        except ValueError as e:
+            create_time = get_create_time_from_text_default_error_handler(create_time_str, e)
     return create_time
 
 
