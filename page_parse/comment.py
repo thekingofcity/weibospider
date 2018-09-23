@@ -61,7 +61,7 @@ def get_create_time_from_text_default_error_handler() -> datetime:
         datetime -- [description]
     """
 
-    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.datetime.now()
 
 
 def get_create_time_from_text(create_time_str: str) -> datetime:
@@ -90,7 +90,7 @@ def get_create_time_from_text(create_time_str: str) -> datetime:
         if len(create_time) == 2:
             create_time = datetime.datetime.now().strftime("%Y-%m-%d ") + create_time[1] + ":00"
             try:
-                datetime.datetime.strptime(create_time, "%Y-%m-%d %H:%M:%S")
+                create_time = datetime.datetime.strptime(create_time, "%Y-%m-%d %H:%M:%S")
             except ValueError:
                 create_time = get_create_time_from_text_default_error_handler()
         else:
@@ -104,7 +104,7 @@ def get_create_time_from_text(create_time_str: str) -> datetime:
         else:
             # the year of create_time will be 1900 (default value)
             year = int(datetime.datetime.now().strftime("%Y"))
-			# https://stackoverflow.com/questions/12468823/python-datetime-setting-fixed-hour-and-minute-after-using-strptime-to-get-day#comment16772522_12468869
+            # https://stackoverflow.com/questions/12468823/python-datetime-setting-fixed-hour-and-minute-after-using-strptime-to-get-day#comment16772522_12468869
             create_time = create_time.replace(year=year)
     else:
         # 2017-12-29 10:48/2017-12-28 10:15
