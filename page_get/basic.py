@@ -29,6 +29,7 @@ COOKIES = get_cookies()
 
 
 # Disable annoying InsecureRequestWarning
+# https://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -48,7 +49,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
     :param need_proxy: whether the request need a http/https proxy
     :return: response text, when a exception is raised, return ''
     """
-    crawler.info('the crawling url is {url}'.format(url=url))
+    crawler.debug('the crawling url is {url}'.format(url=url))
     count = 0
 
     while count < MAX_RETRIES:
