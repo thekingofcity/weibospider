@@ -76,7 +76,18 @@ def get_detail(soup, uid):
                     if '昵称：' in each_str:
                         user.name = each.find(attrs={'class': 'pt_detail'}).get_text()
                     elif '所在地：' in each_str:
-                        user.location = each.find(attrs={'class': 'pt_detail'}).get_text()
+                        location = each.find(attrs={'class': 'pt_detail'}).get_text()
+
+                        # if not hit len == 1 or 2, this line will have effect
+                        user.location = location
+
+                        if location:
+                            location = location.strip().split()
+                            if len(location) == 1:
+                                user.location = location[0]
+                            elif len(location) == 2:
+                                user.location = location[0]
+                                user.location_extend = location[1]
                     elif '性别：' in each_str:
                         gender = each.find(attrs={'class': 'pt_detail'}).get_text()
                         if gender == '男':
