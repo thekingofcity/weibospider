@@ -80,7 +80,7 @@ def get_detail(soup, uid):
 
                         # if not hit len == 1 or 2, this line will have effect
                         user.location = location
-
+ 
                         if location:
                             location = location.strip().split()
                             if len(location) == 1:

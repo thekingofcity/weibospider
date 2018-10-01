@@ -31,14 +31,15 @@ else:
     )
 
 app.conf.update(
-    CELERY_TIMEZONE='Asia/Shanghai',
-    CELERY_ENABLE_UTC=True,
+    timezone='Asia/Shanghai',
+    enable_utc=True,
     CELERYD_LOG_FILE=worker_log_path,
     CELERYBEAT_LOG_FILE=beat_log_path,
-    CELERY_ACCEPT_CONTENT=['json'],
-    CELERY_TASK_SERIALIZER='json',
-    CELERY_RESULT_SERIALIZER='json',
-    CELERYBEAT_SCHEDULE={
+    accept_content=['json'],
+    task_serializer='json',
+    result_serializer='json',
+    worker_prefetch_multiplier=2,
+    beat_schedule={
         'login_task': {
             'task': 'tasks.login.execute_login_task',
             'schedule': timedelta(hours=20),
@@ -75,7 +76,7 @@ app.conf.update(
             'options': {'queue': 'dialogue_crawler', 'routing_key': 'dialogue_info'}
         },
     },
-    CELERY_QUEUES=(
+    task_queues=(
         Queue('login_queue', exchange=Exchange('login_queue', type='direct'), routing_key='for_login'),
 
         Queue('user_crawler', exchange=Exchange('user_crawler', type='direct'), routing_key='for_user_info'),
