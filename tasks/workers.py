@@ -27,7 +27,7 @@ else:
     master = get_redis_master()
     app = Celery('weibo_task', include=tasks, broker=broker_and_backend)
     app.conf.update(
-        BROKER_TRANSPORT_OPTIONS={'master_name': master},
+        broker_transport_options={'master_name': master},
     )
 
 app.conf.update(
