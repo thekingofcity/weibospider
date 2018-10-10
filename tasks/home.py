@@ -26,7 +26,7 @@ AJAX_URL = 'http://weibo.com/p/aj/v6/mblog/mbloglist?ajwvr=6&domain={}&wvr=6&is_
 
 def determine(weibo_datum, timeafter):
     weibo_time = time.mktime(
-        time.strptime(weibo_datum.create_time, '%Y-%m-%d %H:%M'))
+        time.strptime(weibo_datum.create_time, '%Y-%m-%d %H:%M:%S'))
     if weibo_time < timeafter:
         return False
     if WbDataOper.get_wb_by_mid(weibo_datum.weibo_id):
