@@ -63,7 +63,15 @@ def get_weibo_info_detail(each, html):
         return None
 
     time_url = each.find(attrs={'node-type': 'feed_list_item_date'})
-    wb_data.create_time = time_url.get('title', '')
+
+    create_time_str = time_url.get('title', '').strip()
+    # 2017-12-29 10:48/2017-12-28 10:15
+    try:
+        create_time = datetime.datetime.strptime(create_time_str, "%Y-%m-%d %H:%M")
+    except ValueError as e:
+        create_time = datetime.datetime.strptime("1970-01-01 08:00", "%Y-%m-%d %H:%M")
+    wb_data.create_time = create_time.strftime("%Y-%m-%d %H:%M:%S")
+
     wb_data.weibo_url = time_url.get('href', '')
     if ROOT_URL not in wb_data.weibo_url:
         wb_data.weibo_url = '{}://{}{}'.format(PROTOCOL, ROOT_URL, wb_data.weibo_url)
@@ -106,6 +114,7 @@ def get_weibo_info_detail(each, html):
     except Exception:
         wb_data.device = ''
 
+    # support for forward weibo
     try:
         wb_data.repost_num = int(each.find(attrs={'action-type': 'fl_forward'}).find_all('em')[1].text)
     except Exception:
@@ -180,7 +189,15 @@ def get_weibo_info_detail(each, html):
         wb_data.weibo_video = ''
 
         time_url = expand_weibo_dataum.find(attrs={'node-type': 'feed_list_item_date'})
-        wb_data_forward.create_time = time_url.get('title', '')
+
+        create_time_str = time_url.get('title', '').strip()
+        # 2017-12-29 10:48/2017-12-28 10:15
+        try:
+            create_time = datetime.datetime.strptime(create_time_str, "%Y-%m-%d %H:%M")
+        except ValueError as e:
+            create_time = datetime.datetime.strptime("1970-01-01 08:00", "%Y-%m-%d %H:%M")
+        wb_data_forward.create_time = create_time.strftime("%Y-%m-%d %H:%M:%S")
+
         wb_data_forward.weibo_url = time_url.get('href', '')
         if ROOT_URL not in wb_data_forward.weibo_url:
             wb_data_forward.weibo_url = '{}://{}{}'.format(PROTOCOL, ROOT_URL, wb_data_forward.weibo_url)
