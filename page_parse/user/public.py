@@ -170,7 +170,7 @@ def get_fans_or_follows(html, uid, type, url = None):
     :return: list of fans or followers
     """
     if html == '':
-        return list()
+        return list(), True
 
     pattern = re.compile(r'FM.view\((.*)\)')
     soup = BeautifulSoup(html, "html.parser")
