@@ -122,7 +122,7 @@ def get_profile(user_id):
     user = UserOper.get_user_by_uid(user_id)
 
     if user:
-        storage.info('user {id} has already crawled'.format(id=user_id))
+        storage.info('user {id} has already been crawled'.format(id=user_id))
         # SeedidsOper.set_seed_crawled(user_id, 1)
         is_crawled = 1
     else:
@@ -144,7 +144,7 @@ def get_user_profile(user_id):
     user = UserOper.get_user_by_uid(user_id)
 
     if user:
-        storage.info('user {id} has already crawled'.format(id=user_id))
+        storage.info('user {id} has already been crawled'.format(id=user_id))
     else:
         user = get_url_from_web(user_id)
     return user
