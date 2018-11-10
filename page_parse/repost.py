@@ -46,7 +46,6 @@ def get_repost_list(html, mid):
     soup = BeautifulSoup(cont, 'html.parser')
     repost_list = list()
     reposts = soup.find_all(attrs={'action-type': 'feed_list_item'})
-    print(len(reposts))
 
     for repost in reposts:
         wb_repost = WeiboRepost()
@@ -62,27 +61,25 @@ def get_repost_list(html, mid):
             wb_repost.repost_time = repost.find(attrs={'class': 'WB_from S_txt2'}).find('a').get('title')
             wb_repost.weibo_url = REPOST_URL.format(repost.find(attrs={'class': 'WB_from S_txt2'}).find('a').
                                                     get('href'))
-            parents = repost.find(attrs={'class': 'WB_text'}).find(attrs={'node-type': 'text'})
+            # parents = repost.find(attrs={'class': 'WB_text'}).find(attrs={'node-type': 'text'})
             wb_repost.root_weibo_id = mid
 
-            print(wb_repost.user_id)
+            # # Save the current repost user's name and id as the middle result
+            # IdNames.store_id_name(wb_repost.user_name, wb_repost.user_id)
 
-            # Save the current repost user's name and id as the middle result
-            IdNames.store_id_name(wb_repost.user_name, wb_repost.user_id)
-
-            if not parents:
-                wb_repost.parent_user_name = ''
-            else:
-                try:
-                    # We can't get the parent's uid, We can get the parent's nickname, but the name can be changed
-                    temp = parents.find(attrs={'extra-data': 'type=atname'})
-                    if temp:
-                        wb_repost.parent_user_name = temp.get('usercard')[5:]
-                    else:
-                        wb_repost.parent_user_name = ''
-                except Exception as e:
-                    parser.error("error occurred when parsing the parent's name ，the detail is {}".format(e))
-                    wb_repost.parent_user_name = ''
+            # if not parents:
+            #     wb_repost.parent_user_name = ''
+            # else:
+            #     try:
+            #         # We can't get the parent's uid, We can get the parent's nickname, but the name can be changed
+            #         temp = parents.find(attrs={'extra-data': 'type=atname'})
+            #         if temp:
+            #             wb_repost.parent_user_name = temp.get('usercard')[5:]
+            #         else:
+            #             wb_repost.parent_user_name = ''
+            #     except Exception as e:
+            #         parser.error("error occurred when parsing the parent's name ，the detail is {}".format(e))
+            #         wb_repost.parent_user_name = ''
 
         except Exception as e:
             parser.error('repost parse error occurred，the detail is {}'.format(e))
