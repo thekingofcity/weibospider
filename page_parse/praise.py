@@ -40,15 +40,14 @@ def get_praise_list(html, wb_id):
 
     soup = BeautifulSoup(cont, 'html.parser')
     praise_list = list()
-    praises = soup.find_all('li')
+    praises = soup.find_all(attrs={'class': 'list_li S_line1 clearfix'})
     # pattern = re.compile(r'<li uid=\\"\d{10}\\">')
     # praises = pattern.findall(cont)
 
     for praise in praises:
-        wb_praise = WeiboPraise()
         try:
-            wb_praise.user_id = praise['uid']
-            wb_praise.weibo_id = wb_id
+            user_id = praise.find('img').get('usercard')[3:]
+            wb_praise = WeiboPraise(praise['uid'], wb_id)
         except Exception as e:
             parser.error('解析点赞失败，具体信息是{}'.format(e))
         else:

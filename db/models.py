@@ -42,6 +42,13 @@ class WeiboComment(Base):
 class WeiboPraise(Base):
     __table__ = weibo_praise
 
+
+    def __init__(self, user_id, weibo_id):
+        self.user_id = user_id
+        self.weibo_id = weibo_id
+        self.crawl_time = func.now()
+
+
     def __repr__(self):
         return 'user_id:{},weibo_id:{}'.format(self.user_id, self.weibo_id)
 
