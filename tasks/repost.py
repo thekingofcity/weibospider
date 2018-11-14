@@ -12,15 +12,35 @@ from config import get_max_repost_page
 BASE_URL = 'http://weibo.com/aj/v6/mblog/info/big?ajwvr=6&id={}&&page={}'
 
 
+def determine(repost_datum):
+    if RepostOper.get_repost_by_rid(repost_datum.weibo_id):
+        return False
+    else:
+        return True
+
+
 @app.task(ignore_result=True)
 def crawl_repost_by_page(mid, page_num):
     cur_url = BASE_URL.format(mid, page_num)
     html = get_page(cur_url, auth_level=2, is_ajax=True)
-    repost_datas = repost.get_repost_list(html, mid)
-    if page_num == 1:
-        WbDataOper.set_weibo_repost_crawled(mid)
-    RepostOper.add_all(repost_datas)
-    return html, repost_datas
+    repost_data = repost.get_repost_list(html, mid)
+
+    repost_data = [
+        repost_datum for repost_datum in repost_data
+        if determine(repost_datum)
+    ]
+    RepostOper.add_all(repost_data)
+    # if page_num == 1:
+    #     WbDataOper.set_weibo_repost_crawled(mid)
+
+    for repost_datum in repost_data:
+        app.send_task(
+            'tasks.user.crawl_person_infos',
+            args=(repost_datum.user_id, ),
+            queue='user_crawler',
+            routing_key='for_user_info')
+
+    return html, repost_data
 
 
 @app.task(ignore_result=True)
@@ -33,7 +53,7 @@ def crawl_repost_page(mid, uid):
     if not repost_datas:
         return
 
-    # root_user, _ = get_profile(uid)
+    root_user, _ = get_profile(uid)
 
     if total_page < limit:
         limit = total_page + 1
@@ -47,17 +67,17 @@ def crawl_repost_page(mid, uid):
         # if cur_repost_datas:
         #     repost_datas.extend(cur_repost_datas)
 
-    # for index, repost_obj in enumerate(repost_datas):
-    #     user_id = IdNames.fetch_uid_by_name(repost_obj.parent_user_name)
-    #     if not user_id:
-    #         # when it comes to errors, set the args to default(root)
-    #         repost_obj.parent_user_id = root_user.uid
-    #         repost_obj.parent_user_name = root_user.name
-    #     else:
-    #         repost_obj.parent_user_id = user_id
-    #     repost_datas[index] = repost_obj
+    for index, repost_obj in enumerate(repost_datas):
+        user_id = IdNames.fetch_uid_by_name(repost_obj.parent_user_name)
+        if not user_id:
+            # when it comes to errors, set the args to default(root)
+            repost_obj.parent_user_id = root_user.uid
+            repost_obj.parent_user_name = root_user.name
+        else:
+            repost_obj.parent_user_id = user_id
+        repost_datas[index] = repost_obj
 
-    # RepostOper.add_all(repost_datas)
+    RepostOper.add_all(repost_datas)
 
 
 def execute_repost_task():
