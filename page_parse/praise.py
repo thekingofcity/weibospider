@@ -1,4 +1,5 @@
 import json
+import html as htmllib
 
 from bs4 import BeautifulSoup
 
@@ -27,16 +28,24 @@ def get_total_page(html):
 
 
 @parse_decorator([])
-def get_praise_list(html, wb_id):
+def get_praise_list(html:str, wb_id:str):
+    """[get praise list]
+    
+    Arguments:
+        html {str} -- [web page]
+        wb_id {str} -- [weibo mid]
+    
+    Raises:
+        in -- [can't get wanted dom]
+    
+    Returns:
+        WeiboPraise list -- [list contains praises in this html]
+        ext_param -- [extra parameters to get next page]
     """
-    获取点赞列表
-    :param html: 
-    :param wb_id: 
-    :return: 
-    """
+
     cont = get_html_cont(html)
     if not cont:
-        return list()
+        return list(), ''
 
     soup = BeautifulSoup(cont, 'html.parser')
     praise_list = list()
@@ -47,10 +56,20 @@ def get_praise_list(html, wb_id):
     for praise in praises:
         try:
             user_id = praise.find('img').get('usercard')[3:]
-            wb_praise = WeiboPraise(praise['uid'], wb_id)
+            wb_praise = WeiboPraise(user_id, wb_id)
         except Exception as e:
             parser.error('解析点赞失败，具体信息是{}'.format(e))
         else:
             praise_list.append(wb_praise)
 
-    return praise_list
+    like_loading = soup.find(attrs={'node-type': 'like_loading'})
+    feed_like_more = soup.find(attrs={'action-type': 'feed_like_more'})
+    if like_loading:
+        action_data = like_loading.get('action-data', '')
+    elif feed_like_more:
+        action_data = feed_like_more.get('action-data', '')
+    else:
+        action_data = ''
+    ext_param = htmllib.unescape(action_data)
+
+    return praise_list, ext_param

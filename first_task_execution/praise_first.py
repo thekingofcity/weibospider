@@ -17,3 +17,5 @@ if __name__ == '__main__':
                 line = line[:len(line) - 1]  # remove the final \n
                 # print(line)
                 execute_praise_task(line)
+    elif len(sys.argv) == 3:
+        execute_praise_task(None,sys.argv[2])
