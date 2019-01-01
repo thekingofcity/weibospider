@@ -12,6 +12,7 @@ class User(Base):
 
     def __init__(self, uid):
         self.uid = uid
+        self.crawl_time = func.now()
 
 
 class SeedIds(Base):

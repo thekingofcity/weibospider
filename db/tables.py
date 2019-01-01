@@ -33,6 +33,7 @@ wbuser = Table("wbuser", metadata,
                Column("contact_info", String(300), default='', server_default=''),
                Column("education_info", String(300), default='', server_default=''),
                Column("head_img", String(500), default='', server_default=''),
+               Column("crawl_time", DateTime),
                )
 
 # seed ids for user crawling
