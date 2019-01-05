@@ -102,6 +102,7 @@ def get_left(soup):
             cont = json.loads(all_info)['html']
             lsoup = BeautifulSoup(cont, 'html.parser')
             l_id = lsoup.find(attrs={'class': 'WB_frame_b'}).div['id']
+            break
     for script in scripts:
         m = pattern.search(script.string)
         if m and l_id in script.string:
@@ -110,6 +111,7 @@ def get_left(soup):
                 cont = json.loads(all_info)['html']
             except KeyError:
                 return ''
+            break
     return cont
 
 

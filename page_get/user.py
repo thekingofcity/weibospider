@@ -6,7 +6,7 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup
 
 from db.models import User
-from logger import storage
+from logger import storage, crawler
 from .basic import get_page
 from page_parse import is_404
 from config import get_samefollow_uid
@@ -31,7 +31,8 @@ def get_user_detail(user_id, html):
             user.follows_num = 0
             user.fans_num = 0
             user.wb_num = 0
-            return 0
+            crawler.error('fail to parse user {uid}'.format(uid=user_id))
+            return None
         else:
             cont_soup = BeautifulSoup(cont, 'html.parser')
             user.follows_num = person.get_friends(cont_soup)
@@ -104,8 +105,6 @@ def get_url_from_web(user_id):
         user.level = public.get_level(html)
 
         if user.name:
-            UserOper.add_one(user)
-            storage.info('Has stored user {id} info successfully'.format(id=user_id))
             return user
         else:
             return None
@@ -123,14 +122,11 @@ def get_profile(user_id):
 
     if user:
         storage.info('user {id} has already been crawled'.format(id=user_id))
-        # SeedidsOper.set_seed_crawled(user_id, 1)
         is_crawled = 1
     else:
         user = get_url_from_web(user_id)
-        # if user is not None:
-        #     SeedidsOper.set_seed_crawled(user_id, 1)
-        # else:
-        #     SeedidsOper.set_seed_crawled(user_id, 2)
+        UserOper.add_one(user)
+        storage.info('Has stored user {id} info successfully'.format(id=user_id))
         is_crawled = 0
 
     return user, is_crawled
