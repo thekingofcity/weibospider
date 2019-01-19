@@ -120,9 +120,18 @@ def get_profile(user_id):
     """
     user = UserOper.get_user_by_uid(user_id)
 
-    if user:
-        storage.info('user {id} has already been crawled'.format(id=user_id))
-        is_crawled = 1
+    # .first() to get one or none
+    if user.first():
+        if user.first().crawl_time:
+            storage.info('user {id} has already been crawled'.format(id=user_id))
+            is_crawled = 1
+        else:
+            storage.info('user {id} has been expired. Recrawling'.format(id=user_id))
+            user_updated = get_url_from_web(user_id)
+            user = UserOper.merge_user(user, user_updated)
+            storage.info('Has updated user {id} info successfully'.format(id=user_id))
+            is_crawled = 0
+        user = user.first()
     else:
         user = get_url_from_web(user_id)
         UserOper.add_one(user)

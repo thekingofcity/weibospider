@@ -1,4 +1,4 @@
-from sqlalchemy import text
+from sqlalchemy import text, func
 from sqlalchemy.exc import IntegrityError as SqlalchemyIntegrityError
 from pymysql.err import IntegrityError as PymysqlIntegrityError
 from sqlalchemy.exc import InvalidRequestError
@@ -150,12 +150,35 @@ class SeedidsOper:
 
 class UserOper(CommonOper):
     @classmethod
-    def get_user_by_uid(cls, uid):
-        return db_session.query(User).filter(User.uid == uid).first()
+    def get_user_by_uid(cls, uid: str):
+        return db_session.query(User).filter(User.uid == uid)
 
     @classmethod
-    def get_user_by_name(cls, user_name):
+    def get_user_by_name(cls, user_name: str):
         return db_session.query(User).filter(User.name == user_name).first()
+
+    @classmethod
+    def merge_user(cls, user, user_updated):
+        # data is a dict contains all field from user_updated except id and crawl_time
+        data = {
+            column: getattr(user_updated, column)
+            for column in User.__table__.columns.keys()
+        }
+        data.pop('id')
+        data.pop('crawl_time')
+        # https://stackoverflow.com/questions/31904460/how-to-update-all-object-columns-in-sqlalchemy
+        user.update(data)
+        db_session.commit()
+        # How to update TIMESTAMP
+        # Shit this https://groups.google.com/forum/#!msg/sqlalchemy/wGUuAy27otM/FFHzRLZUAgAJ
+        # Search onupdate in https://realpython.com/flask-connexion-rest-api-part-2/
+        
+        # No use, merge only work with PK while uid is only unique
+        # https://stackoverflow.com/a/33897969/7418806
+        # https://stackoverflow.com/a/48373874/7418806
+        # https://gist.github.com/timtadh/7811458
+        # db_session.merge(user)
+        return user
 
 
 class UserRelationOper(CommonOper):

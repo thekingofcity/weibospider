@@ -32,7 +32,7 @@ def crawl_follower_fans(uid, verify_type):
     # SeedidsOper.set_seed_other_crawled(uid)
 
 
-@app.task(ignore_result=True, acks_late=True)
+@app.task(ignore_result=True, acks_late=True, soft_time_limit=30)
 def crawl_person_infos(uid):
     """
     Crawl user info and their fans and followers

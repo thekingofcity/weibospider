@@ -109,7 +109,6 @@ def crawl_weibo_datas(uid):
         #     break
 
         if cur_page == 1:
-            auth_level = 1
             auth_level = 2
 
             domain = public.get_userdomain(html)
@@ -126,13 +125,6 @@ def crawl_weibo_datas(uid):
             if total_page < limit:
                 limit = total_page
 
-            # # Since the second ajax of page 1 has already been crawled
-            # # in the code above and has been stored in databse,
-            # # we only have to crawl the first ajax of page 1
-            # app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_0, auth_level), queue='ajax_home_crawler',
-            #               routing_key='ajax_home_info')
-            # return
-
         else:
             auth_level = 2
 
@@ -147,12 +139,7 @@ def crawl_weibo_datas(uid):
             app.send_task('tasks.home.crawl_ajax_page', args=(ajax_url_1, auth_level), queue='ajax_home_crawler',
                           routing_key='ajax_home_info')
 
-            if cur_page == 3:
-                return
-
         cur_page += 1
-
-    # SeedidsOper.set_seed_home_crawled(uid)
 
 
 def execute_home_task(uid: str = None):
