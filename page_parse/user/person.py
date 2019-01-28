@@ -15,12 +15,9 @@ def get_friends(soup):
     :param html:
     :return: 返回关注数
     """
-    # cont = public.get_left(html)
-    # if cont == '':
-    #     return 0
-    # soup = BeautifulSoup(cont, 'html.parser')
     try:
-        return int(soup.find_all('strong')[0].get_text())
+        m = re.search(r'\w*(\d+)\w*', soup.find_all('strong')[0].get_text())
+        return int(m.group[1])
     except Exception:
         return 0
 
@@ -31,12 +28,9 @@ def get_fans(soup):
     :param html:
     :return: 返回粉丝数
     """
-    # cont = public.get_left(html)
-    # if cont == '':
-    #     return 0
-    # soup = BeautifulSoup(cont, 'html.parser')
     try:
-        return int(soup.find_all('strong')[1].get_text())
+        m = re.search(r'\w*(\d+)\w*', soup.find_all('strong')[1].get_text())
+        return int(m.group[1])
     except Exception:
         return 0
 
@@ -47,12 +41,9 @@ def get_status(soup):
     :param html:
     :return: 返回微博总数
     """
-    # cont = public.get_left(html)
-    # if cont == '':
-    #     return 0
-    # soup = BeautifulSoup(cont, 'html.parser')
     try:
-        return int(soup.find_all('strong')[2].get_text())
+        m = re.search(r'\w*(\d+)\w*', soup.find_all('strong')[2].get_text())
+        return int(m.group[1])
     except Exception:
         return 0
 
