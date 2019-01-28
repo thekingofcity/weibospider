@@ -107,11 +107,13 @@ def get_left(soup):
         m = pattern.search(script.string)
         if m and l_id in script.string:
             all_info = m.group(1)
-            try:
-                cont = json.loads(all_info)['html']
-            except KeyError:
-                return ''
-            break
+            cont = json.loads(all_info)
+            if l_id in cont['domid']:
+                try:
+                    cont = cont['html']
+                except KeyError:
+                    return ''
+                break
     return cont
 
 

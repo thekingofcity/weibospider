@@ -17,7 +17,7 @@ def get_friends(soup):
     """
     try:
         m = re.search(r'\w*(\d+)\w*', soup.find_all('strong')[0].get_text())
-        return int(m.group[1])
+        return int(m.group(1))
     except Exception:
         return 0
 
@@ -30,7 +30,7 @@ def get_fans(soup):
     """
     try:
         m = re.search(r'\w*(\d+)\w*', soup.find_all('strong')[1].get_text())
-        return int(m.group[1])
+        return int(m.group(1))
     except Exception:
         return 0
 
@@ -43,7 +43,7 @@ def get_status(soup):
     """
     try:
         m = re.search(r'\w*(\d+)\w*', soup.find_all('strong')[2].get_text())
-        return int(m.group[1])
+        return int(m.group(1))
     except Exception:
         return 0
 
