@@ -128,9 +128,13 @@ def get_profile(user_id):
         else:
             storage.info('user {id} has been expired. Recrawling'.format(id=user_id))
             user_updated = get_url_from_web(user_id)
-            user = UserOper.merge_user(user, user_updated)
-            storage.info('Has updated user {id} info successfully'.format(id=user_id))
-            is_crawled = 0
+            if not user_updated:
+                storage.info('user {id} can not be updated, still the old'.format(id=user_id))
+                is_crawled = 0
+            else:
+                user = UserOper.merge_user(user, user_updated)
+                storage.info('Has updated user {id} info successfully'.format(id=user_id))
+                is_crawled = 1
         user = user.first()
     else:
         user = get_url_from_web(user_id)
