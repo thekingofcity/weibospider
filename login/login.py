@@ -13,13 +13,10 @@ import requests
 from config import headers
 from utils import (code_verificate, getip)
 from page_parse import is_403
-from exceptions import LoginException
-from db.redis_db import Cookies
-from db.dao import LoginInfoOper
-from config import (
-    get_code_username, get_code_password)
-from logger import (
-    crawler, other)
+from exceptions import (LoginWrongPasswordException,
+                        LoginAccountForbiddenException)
+from config import (get_code_username, get_code_password)
+from logger import (crawler, other)
 
 
 VERIFY_CODE_PATH = './{}{}.png'
@@ -87,7 +84,6 @@ def get_redirect(name, data, post_url, session, proxy):
     # if name or password is wrong, set the value to 2
     if 'retcode=101' in login_loop:
         crawler.error('invalid password for {}, please ensure your account and password'.format(name))
-        LoginInfoOper.freeze_account(name, 2)
         return ''
 
     if 'retcode=2070' in login_loop:
@@ -240,11 +236,10 @@ def get_session(name, password):
 
             if is_403(resp.text):
                 other.error('account {} has been forbidden'.format(name))
-                LoginInfoOper.freeze_account(name, 0)
-                return None
-            other.info('Login successful! The login account is {}'.format(name))
-            Cookies.store_cookies(name, session.cookies.get_dict(), proxy['http'])
-            return session
-        
+                raise LoginAccountForbiddenException(name)
+            else:
+                other.info('Login successful! The login account is {}'.format(name))
+                return session, proxy
+
     other.error('login failed for {}'.format(name))
-    return None
+    raise LoginWrongPasswordException(name)

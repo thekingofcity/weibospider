@@ -103,6 +103,14 @@ def get_cookie_expire_time():
     return cf.get('cookie_expire_time')
 
 
+def get_ip_expire_time():
+    return cf.get('ip_expire_time')
+
+
+def get_login_interval():
+    return cf.get('login_interval')
+
+
 def get_email_args():
     return cf.get('email')
 
