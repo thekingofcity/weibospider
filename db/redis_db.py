@@ -52,7 +52,7 @@ class Cookies(object):
         pickled_cookies = json.dumps({
             'cookies': cookies,
             'password': password,
-            'loginTime': datetime.datetime.now().timestamp(),
+            'loginTime': datetime.datetime.utcnow().timestamp(),
             'proxy': proxy
         })
         cookies_con.hset('account_pool', name, pickled_cookies)
@@ -141,7 +141,7 @@ class Cookies(object):
             retry {int} -- [retry times]
         """
 
-        pickled_cookies = json.dumps({'password': password, 'retry': 0})
+        pickled_cookies = json.dumps({'password': password, 'retry': retry})
         cookies_con.hset('login_pool', name, pickled_cookies)
 
 
@@ -181,9 +181,9 @@ class Cookies(object):
         """
 
         for ip in cookies_con.hscan_iter('heartbeat'):
-            last_timestamp:str = ip[1].decode('utf-8')
+            last_timestamp = ip[1].decode('utf-8')  # type: str
             ip = ip[0].decode('utf-8')
-            last_timestamp:datetime = datetime.datetime.fromtimestamp(float(last_timestamp))
+            last_timestamp = datetime.datetime.fromtimestamp(float(last_timestamp))  # type: datetime
             if datetime.datetime.utcnow() - last_timestamp > datetime.timedelta(minutes=ip_expire_time):
                 print('ip/pod:{ip} has missed its heartbeat'.format(ip=ip))
                 # crawler.warning('ip/pod:{ip} has missed its heartbeat'.format(ip=ip))
