@@ -54,7 +54,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
         if auth_level == 2:
             name_cookies = Cookies.fetch_cookies()
 
-            if name_cookies is None:
+            if name_cookies[0] is None:
                 if count < MAX_RETRIES:
                     # wait for 3x login_interval(minutes) for new account in account_pool
                     time.sleep(login_interval*60*3)

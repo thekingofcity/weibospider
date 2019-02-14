@@ -55,7 +55,8 @@ class Cookies(object):
             'loginTime': datetime.datetime.utcnow().timestamp(),
             'proxy': proxy
         })
-        cookies_con.hset('account_pool', name, pickled_cookies)
+        if not cookies_con.hexists('account_pool', name):
+            cookies_con.hset('account_pool', name, pickled_cookies)
 
     @classmethod
     def fetch_cookies(cls) -> Tuple[str, str]:
@@ -141,6 +142,10 @@ class Cookies(object):
             retry {int} -- [retry times]
         """
 
+        if cookies_con.hexists('login_pool', name):
+            # multiple thread requesting weibo with account A may get banned at the same time
+            # but they will all call abnormal_cookies_in_ip
+            return
         pickled_cookies = json.dumps({'password': password, 'retry': retry})
         cookies_con.hset('login_pool', name, pickled_cookies)
 
@@ -251,13 +256,10 @@ class Cookies(object):
         """
 
         account = cookies_con.hget(key, name)
-        cookies = json.loads(account.decode('utf-8'))
-        pickled_cookies = json.dumps({
-            'password': cookies['password'],
-            'retry': 0
-        })
-        cookies_con.hset('login_pool', name, pickled_cookies)
         cookies_con.hdel(key, name)
+        if account is None: return
+        cookies = json.loads(account.decode('utf-8'))
+        cls.push_account_to_login_pool(name, cookies['password'], 0)
 
 
 class Urls(object):
