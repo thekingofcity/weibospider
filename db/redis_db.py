@@ -1,3 +1,5 @@
+import os
+import time
 import json
 import socket
 import datetime
@@ -94,6 +96,8 @@ class Cookies(object):
         while not account:
             current_ip_cookies_pool = cookies_con.exists(ip)
             if not current_ip_cookies_pool:
+                while not cls.lock(ip+"mutex",os.getpid()):
+                    time.sleep(1)
                 # we have to acquire new cookies form account_pool
                 # account = (name, {'cookies': cookies,'password': password, ...})
                 for account in cookies_con.hscan_iter('account_pool'):
@@ -107,6 +111,7 @@ class Cookies(object):
                     return None, None
                 cookies_con.hdel('account_pool', account[0])
                 cookies_con.hset(ip, account[0], account[1])
+                cls.unlock(ip+"mutex",os.getpid())
             else:
                 # random select one in current_ip_cookies_pool
                 # Now only implemented first one
@@ -255,11 +260,24 @@ class Cookies(object):
             name {[str]} -- [account name]
         """
 
+        while not cls.lock(key+"mutex",os.getpid()):
+            time.sleep(1)
         account = cookies_con.hget(key, name)
-        cookies_con.hdel(key, name)
         if account is None: return
+        cookies_con.hdel(key, name)
         cookies = json.loads(account.decode('utf-8'))
         cls.push_account_to_login_pool(name, cookies['password'], 0)
+        cls.unlock(key+"mutex",os.getpid())
+
+    @classmethod
+    def lock(cls, lockKey:str, requestId:str)->bool:
+        return cookies_con.set(lockKey, requestId, ex=1, nx=True)
+
+    @classmethod
+    def unlock(cls, lockKey:str, requestId:str)->bool:
+        script="if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end"
+        script_obj=cookies_con.register_script(script)
+        return script_obj(keys=[lockKey],args=[requestId])
 
 
 class Urls(object):

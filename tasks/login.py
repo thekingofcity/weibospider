@@ -23,11 +23,10 @@ def login_task(name, data):
             retry += 1
             Cookies.push_account_to_login_pool(name, password, retry)
         except LoginWrongPasswordException:
-            # delete account permanently
-            LoginInfoOper.freeze_account(name, 2)
+            retry += 1
+            Cookies.push_account_to_login_pool(name, password, retry)
     else:
-        # delete account permanently
-        LoginInfoOper.freeze_account(name, 0)
+        Cookies.push_account_to_login_pool(name, password, retry)
 
 
 def execute_login_task():
