@@ -11,20 +11,18 @@ from logger import crawler
 from login import get_cookies
 from db.dao import LoginInfoOper
 from utils import (send_email, getip)
-from db.redis_db import (
-    Urls, Cookies)
-from page_parse import (
-    is_403, is_404, is_complete)
-from decorators import (
-    timeout_decorator, timeout)
-from config import (
-    get_timeout, get_crawl_interal, get_excp_interal, get_max_retries)
+from db.redis_db import (Urls, Cookies)
+from page_parse import (is_403, is_404, is_complete)
+from decorators import (timeout_decorator, timeout)
+from config import (get_timeout, get_crawl_interal, get_excp_interal,
+                    get_max_retries, get_login_interval)
 
 
 TIME_OUT = int(get_timeout())
 INTERAL = get_crawl_interal()
 MAX_RETRIES = get_max_retries()
 EXCP_INTERAL = get_excp_interal()
+login_interval = int(get_login_interval())
 COOKIES = get_cookies()
 
 
@@ -56,10 +54,15 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
         if auth_level == 2:
             name_cookies = Cookies.fetch_cookies()
 
-            if name_cookies is None:
-                crawler.warning('No cookie in cookies pool. Maybe all accounts are banned, or all cookies are expired')
-                send_email()
-                os.kill(os.getppid(), signal.SIGTERM)
+            if name_cookies[0] is None:
+                if count < MAX_RETRIES:
+                    # wait for 3x login_interval(minutes) for new account in account_pool
+                    time.sleep(login_interval*60*3)
+                    count += 1
+                else:
+                    crawler.warning('No cookie in cookies pool. Maybe all accounts are banned, or all cookies are expired')
+                    send_email()
+                    os.kill(os.getppid(), signal.SIGTERM)
 
             # There is no difference between http and https address.
             # proxy = {'http': name_cookies[2], 'https': name_cookies[2], }
@@ -74,7 +77,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
                 os.kill(os.getppid(), signal.SIGTERM)
             # if proxy['http'] is None:
             #     crawler.warning('No available ip in ip pools. Using local ip instead.')
-        
+
         try:
             if auth_level == 2:
                 resp = requests.get(url, headers=headers, cookies=name_cookies[1], timeout=TIME_OUT, verify=False)
@@ -104,7 +107,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
             if is_banned(resp.url) or is_403(page):
                 crawler.warning('Account {} has been banned'.format(name_cookies[0]))
                 LoginInfoOper.freeze_account(name_cookies[0], 0)
-                Cookies.delete_cookies(name_cookies[0])
+                Cookies.abnormal_cookies_in_ip(name_cookies[0])
                 count += 1
                 continue
 

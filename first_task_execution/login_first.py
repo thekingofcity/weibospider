@@ -4,7 +4,8 @@ sys.path.append('.')
 sys.path.append('..')
 
 from tasks import execute_login_task
+from tasks.login import push_account_to_login_pool, check_heartbeat
 
 if __name__ == '__main__':
-    # you should execute this file, because celery timer will execute login delayed
+    check_heartbeat()
     execute_login_task()

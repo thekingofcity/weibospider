@@ -15,3 +15,11 @@ class LoginException(Exception):
     Login error for weibo login
     """
 
+class LoginWrongPasswordException(LoginException):
+    def __init__(self, name):
+        self.name = name
+
+
+class LoginAccountForbiddenException(LoginException):
+    def __init__(self, name):
+        self.name = name

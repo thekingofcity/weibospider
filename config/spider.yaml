@@ -41,7 +41,11 @@ crawling_mode: normal
 # if you choose quick mode, your cookie will be used util it's banned
 share_host_count: 5
 # the expire time(hours) of each weibo cookies
-cookie_expire_time: 23
+cookie_expire_time: 24
+# the expire time(minutes) of each ip address
+ip_expire_time: 15
+# the login interval(minutes)
+login_interval: 1
 
 # 1 for allow download images, otherwise set it to 0
 images_allow: 1
