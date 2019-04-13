@@ -40,7 +40,7 @@ def _get_statushtml(html):
     cont = ''
     for script in scripts:
         try:
-            m = pattern.search(script.string)
+            m = pattern.search(script.string if script.string is not None else "")
             if m and 'pl.content.weiboDetail.index' in script.string:
                 all_info = m.group(1)
                 # TODO 留意这里可能发生异常

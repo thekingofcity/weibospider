@@ -47,7 +47,7 @@ def get_description(soup,url=None):
     cont = ''
     description = ''
     for script in scripts:
-        m = pattern.search(script.string)
+        m = pattern.search(script.string if script.string is not None else "")
         if m and 'pl.content.homeFeed.index' in script.string and '简介' in script.string:
             all_info = m.group(1)
             cont = json.loads(all_info)['html']

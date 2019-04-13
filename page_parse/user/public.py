@@ -29,7 +29,7 @@ def _get_header(html):
     pattern = re.compile(r'FM.view\((.*)\)')
     cont = ''
     for script in scripts:
-        m = pattern.search(script.string)
+        m = pattern.search(script.string if script.string is not None else "")
         if m and 'pl.header.head.index' in script.string:
             all_info = m.group(1)
             cont = json.loads(all_info)['html']
@@ -96,7 +96,7 @@ def get_left(soup):
     l_id = ''
     # first ensure the left part
     for script in scripts:
-        m = pattern.search(script.string)
+        m = pattern.search(script.string if script.string is not None else "")
         if m and 'WB_frame_b' in script.string:
             all_info = m.group(1)
             cont = json.loads(all_info)['html']
@@ -104,7 +104,7 @@ def get_left(soup):
             l_id = lsoup.find(attrs={'class': 'WB_frame_b'}).div['id']
             break
     for script in scripts:
-        m = pattern.search(script.string)
+        m = pattern.search(script.string if script.string is not None else "")
         if m and l_id in script.string:
             all_info = m.group(1)
             cont = json.loads(all_info)
@@ -131,7 +131,7 @@ def get_right(soup):
     # first ensure right part,enterprise users may have two r_id
     rids = []
     for script in scripts:
-        m = pattern.search(script.string)
+        m = pattern.search(script.string if script.string is not None else "")
         if m and 'WB_frame_c' in script.string:
             all_info = m.group(1)
             cont = json.loads(all_info).get('html', '')
@@ -143,7 +143,7 @@ def get_right(soup):
                 rids.append(r['id'])
     for script in scripts:
         for r_id in rids:
-            m = pattern.search(script.string)
+            m = pattern.search(script.string if script.string is not None else "")
             if m and r_id in script.string:
                 all_info = m.group(1)
                 cont += json.loads(all_info).get('html', '')

@@ -154,7 +154,7 @@ def get_isFan(html, uids, current_uid):
     intersection_ids = list()  # Contains the intersection of param uids and user_ids
     relations = list()  # Contains list to be stored in UserRelation table
     for script in scripts:
-        m = pattern.search(script.string)
+        m = pattern.search(script.string if script.string is not None else "")
         # Find the <script>FM.view({"ns":"pl.content.followTab.index","domid":"Pl_Official_HisRelation__59",...
         if m and 'pl.content.followTab.index' in script.string:
             all_info = m.group(1)
