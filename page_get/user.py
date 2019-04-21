@@ -138,9 +138,13 @@ def get_profile(user_id):
         user = user.first()
     else:
         user = get_url_from_web(user_id)
-        UserOper.add_one(user)
-        storage.info('Has stored user {id} info successfully'.format(id=user_id))
-        is_crawled = 0
+        if user is not None:
+            UserOper.add_one(user)
+            storage.info('Has stored user {id} info successfully'.format(id=user_id))
+            is_crawled = 1
+        else:
+            storage.info('Can not get user {id} info'.format(id=user_id))
+            is_crawled = 0
 
     return user, is_crawled
 
