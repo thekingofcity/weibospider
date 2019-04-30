@@ -14,7 +14,7 @@ from config import headers
 from utils import (code_verificate, getip)
 from page_parse import is_403
 from exceptions import (LoginWrongPasswordException,
-                        LoginAccountForbiddenException)
+                        LoginAccountForbiddenException, LoginDecodeException)
 from config import (get_code_username, get_code_password)
 from logger import (crawler, other)
 
@@ -79,7 +79,11 @@ def get_password(password, servertime, nonce, pubkey):
 # post data and get the next url
 def get_redirect(name, data, post_url, session, proxy):
     logining_page = session.post(post_url, data=data, headers=headers, proxies=proxy)
-    login_loop = logining_page.content.decode("GBK")
+    try:
+        login_loop = logining_page.content.decode("GBK")
+    except UnicodeDecodeError:
+        crawler.error('GBK decode error')
+        raise LoginDecodeException
 
     # if name or password is wrong, set the value to 2
     if 'retcode=101' in login_loop:

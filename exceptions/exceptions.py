@@ -23,3 +23,8 @@ class LoginWrongPasswordException(LoginException):
 class LoginAccountForbiddenException(LoginException):
     def __init__(self, name):
         self.name = name
+
+
+class LoginDecodeException(LoginException):
+    def __init__(self, name):
+        self.name = name

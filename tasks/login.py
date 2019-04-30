@@ -3,7 +3,7 @@ import json
 
 from db.redis_db import Cookies
 from exceptions import (LoginWrongPasswordException,
-                        LoginAccountForbiddenException)
+                        LoginAccountForbiddenException, LoginDecodeException)
 from logger import crawler
 from login import get_session
 from db.dao import LoginInfoOper
@@ -19,10 +19,8 @@ def login_task(name, data):
         try:
             session, proxy = get_session(name, password)
             Cookies.store_cookies(name, password, session.cookies.get_dict(), proxy['http'])
-        except LoginAccountForbiddenException:
-            retry += 1
-            Cookies.push_account_to_login_pool(name, password, retry)
-        except LoginWrongPasswordException:
+        except (LoginAccountForbiddenException, LoginWrongPasswordException,
+                LoginDecodeException):
             retry += 1
             Cookies.push_account_to_login_pool(name, password, retry)
     else:
