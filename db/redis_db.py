@@ -272,7 +272,9 @@ class Cookies(object):
 
         cls.__lock(key+"mutex",os.getpid())
         account = cookies_con.hget(key, name)
-        if account is None: return
+        if account is None:
+            cls.__unlock(key+"mutex",os.getpid())
+            return
         cookies_con.hdel(key, name)
         cookies = json.loads(account.decode('utf-8'))
         cls.push_account_to_login_pool(name, cookies['password'], 0)

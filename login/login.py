@@ -83,7 +83,7 @@ def get_redirect(name, data, post_url, session, proxy):
         login_loop = logining_page.content.decode("GBK")
     except UnicodeDecodeError:
         crawler.error('GBK decode error')
-        raise LoginDecodeException
+        raise LoginDecodeException(name)
 
     # if name or password is wrong, set the value to 2
     if 'retcode=101' in login_loop:
