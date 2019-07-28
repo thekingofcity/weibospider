@@ -19,12 +19,17 @@ def login_task(name, data):
         try:
             session, proxy = get_session(name, password)
             Cookies.store_cookies(name, password, session.cookies.get_dict(), proxy['http'])
+            return
         except (LoginAccountForbiddenException, LoginWrongPasswordException,
                 LoginDecodeException):
             retry += 1
-            Cookies.push_account_to_login_pool(name, password, retry)
+    elif retry >=30:
+        # fix for retry > 3
+        retry = 0
     else:
-        Cookies.push_account_to_login_pool(name, password, retry)
+        # while retry in range(4,300), spin
+        retry += 1
+    Cookies.push_account_to_login_pool(name, password, retry)
 
 
 def execute_login_task():
