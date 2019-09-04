@@ -8,7 +8,7 @@ from .models import (
     LoginInfo, KeywordsWbdata, KeyWords, SeedIds, UserRelation,
     WeiboComment, WeiboRepost, User, WeiboData, WeiboPraise
 )
-from decorators import db_commit_decorator
+from decorators import db_commit_decorator, db_fetch_decorator
 
 
 class CommonOper:
@@ -150,14 +150,17 @@ class SeedidsOper:
 
 class UserOper(CommonOper):
     @classmethod
+    @db_fetch_decorator
     def get_user_by_uid(cls, uid: str):
         return db_session.query(User).filter(User.uid == uid)
 
     @classmethod
+    @db_fetch_decorator
     def get_user_by_name(cls, user_name: str):
         return db_session.query(User).filter(User.name == user_name).first()
 
     @classmethod
+    @db_commit_decorator
     def merge_user(cls, user, user_updated):
         # data is a dict contains all field from user_updated except id and crawl_time
         data = {
@@ -172,7 +175,7 @@ class UserOper(CommonOper):
         # How to update TIMESTAMP
         # Shit this https://groups.google.com/forum/#!msg/sqlalchemy/wGUuAy27otM/FFHzRLZUAgAJ
         # Search onupdate in https://realpython.com/flask-connexion-rest-api-part-2/
-        
+
         # No use, merge only work with PK while uid is only unique
         # https://stackoverflow.com/a/33897969/7418806
         # https://stackoverflow.com/a/48373874/7418806

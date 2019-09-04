@@ -36,6 +36,23 @@ def db_commit_decorator(func):
     return session_commit
 
 
+def db_fetch_decorator(func):
+    """Fix for ```sqlalchemy.exc.InvalidRequestError: This session is in 'prepared' state;
+    no further SQL can be emitted within this transaction.```
+
+    https://stackoverflow.com/questions/24445642/sqlalchemy-session-error-invalidrequesterror
+    """
+    @wraps(func)
+    def session_fetch(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            storage.error('DB operation error，method: {}; here are details:{}'.format(func.__name__, format_tb(
+                                                                                                    e.__traceback__)))
+            db_session.commit()
+    return session_fetch
+
+
 def parse_decorator(return_value):
     """
     :param return_value: catch exceptions when parsing pages, return the default value
