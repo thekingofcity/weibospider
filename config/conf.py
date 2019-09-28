@@ -140,3 +140,7 @@ def get_samefollow_uid():
 
 def get_proxy_url():
     return cf.get('proxy_url')
+
+
+def get_user_info_expire_time():
+    return cf.get('user_info_expire_time')

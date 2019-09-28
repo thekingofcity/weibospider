@@ -1,5 +1,6 @@
 import json
 import time
+import datetime
 import re
 import requests
 from urllib.parse import quote
@@ -9,11 +10,9 @@ from db.models import User
 from logger import storage, crawler
 from .basic import get_page
 from page_parse import is_404
-from config import get_samefollow_uid
-from db.dao import (
-    UserOper, SeedidsOper)
-from page_parse.user import (
-    enterprise, person, public)
+from config import (get_samefollow_uid, get_user_info_expire_time)
+from db.dao import (UserOper, SeedidsOper)
+from page_parse.user import (enterprise, person, public)
 BASE_URL = 'http://weibo.com/p/{}{}/info?mod=pedit_more'
 NEWCARD_URL = 'https://www.weibo.com/aj/v6/user/newcard?ajwvr=6&name={}&type=1&callback=STK_{}39'
 SAMEFOLLOW_URL = 'https://weibo.com/p/100505{}/follow?relate=same_follow&amp;from=page_100505_profile&amp;wvr=6&amp;mod=bothfollow'
@@ -122,7 +121,10 @@ def get_profile(user_id):
 
     # .first() to get one or none
     if user.first():
-        if user.first().crawl_time:
+        user_info_expire_time = get_user_info_expire_time()
+        allowed_oldest_time = datetime.datetime.utcnow() - datetime.timedelta(days=user_info_expire_time)
+        # user.first().crawl_time: datetime.datetime
+        if user.first().crawl_time and user.first().crawl_time > allowed_oldest_time:
             storage.info('user {id} has already been crawled'.format(id=user_id))
             is_crawled = 1
         else:

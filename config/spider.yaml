@@ -25,6 +25,9 @@ time_after: '1970-01-01 00:00:00'
 # if yes rows in wbuser will have 1 at isFan column
 samefollow_uid: ''
 
+# expire time of user info(days)
+user_info_expire_time: 30
+
 # The value of running_mode can be normal or quick.
 # In normal mode, it will be more stable, while in quick mode, the crawling speed will
 # be much faster, and the weibo account almostly will be banned

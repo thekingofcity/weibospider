@@ -8,4 +8,5 @@ from .conf import (get_db_args, get_redis_args, get_timeout, get_crawl_interal,
                    get_share_host_count, get_cookie_expire_time,
                    get_email_args, get_images_allow, get_images_path,
                    get_images_type, get_time_after, get_samefollow_uid,
-                   get_proxy_url, get_ip_expire_time, get_login_interval)
+                   get_proxy_url, get_ip_expire_time, get_login_interval,
+                   get_user_info_expire_time)
