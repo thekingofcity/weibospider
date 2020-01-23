@@ -144,3 +144,7 @@ def get_proxy_url():
 
 def get_user_info_expire_time():
     return cf.get('user_info_expire_time')
+
+
+def get_adapter_ip():
+    return cf.get('adapter_ip')

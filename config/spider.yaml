@@ -12,6 +12,9 @@ max_repost_page: 2000          # max repost page for crawling
 max_dialogue_page: 2000        # max dialogue page for crawling
 max_retries: 5                 # retry times for crawling
 
+# requests via another ip, leave blank if you do not need it
+adapter_ip:
+
 # You should set the args below if you login from uncommon place
 # It's for verification code indentified
 yundama_username: xxxxxx           # account for yundama
@@ -23,7 +26,7 @@ time_after: '1970-01-01 00:00:00'
 
 # whether account follows the uid below
 # if yes rows in wbuser will have 1 at isFan column
-samefollow_uid: ''
+samefollow_uid: 
 
 # expire time of user info(days)
 user_info_expire_time: 30

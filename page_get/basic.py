@@ -16,7 +16,7 @@ from db.redis_db import (Urls, Cookies)
 from page_parse import (is_403, is_404, is_complete)
 from decorators import (timeout_decorator, timeout)
 from config import (get_timeout, get_crawl_interal, get_excp_interal,
-                    get_max_retries, get_login_interval)
+                    get_max_retries, get_login_interval, get_adapter_ip)
 
 TIME_OUT = int(get_timeout())
 INTERAL = get_crawl_interal()
@@ -24,6 +24,9 @@ MAX_RETRIES = get_max_retries()
 EXCP_INTERAL = get_excp_interal()
 login_interval = int(get_login_interval())
 COOKIES = get_cookies()
+APAPTER_IP = get_adapter_ip()
+if APAPTER_IP:
+    adapter = SourceAddressAdapter(APAPTER_IP)
 
 # Disable annoying InsecureRequestWarning
 # https://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
@@ -90,8 +93,10 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
                 with requests.Session() as s:
                     s.headers.update(headers)
                     s.cookies.update(COOKIES)
-                    s.mount('http://', SourceAddressAdapter(''))
-                    s.mount('https://', SourceAddressAdapter(''))
+                    if APAPTER_IP:
+                        # requests via another ip
+                        s.mount('http://', adapter)
+                        s.mount('https://', adapter)
                     resp = s.get(url,
                                  timeout=TIME_OUT,
                                  verify=False,
