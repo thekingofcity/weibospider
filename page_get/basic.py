@@ -5,6 +5,7 @@ import json
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests_toolbelt.adapters.source import SourceAddressAdapter
 
 from config import headers
 from logger import crawler
@@ -86,12 +87,15 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
                                     timeout=TIME_OUT,
                                     verify=False)
             elif auth_level == 1:
-                resp = requests.get(url,
-                                    headers=headers,
-                                    cookies=COOKIES,
-                                    timeout=TIME_OUT,
-                                    verify=False,
-                                    proxies=proxy)
+                with requests.Session() as s:
+                    s.headers.update(headers)
+                    s.cookies.update(COOKIES)
+                    s.mount('http://', SourceAddressAdapter(''))
+                    s.mount('https://', SourceAddressAdapter(''))
+                    resp = s.get(url,
+                                 timeout=TIME_OUT,
+                                 verify=False,
+                                 proxies=proxy)
             else:
                 resp = requests.get(url,
                                     headers=headers,
