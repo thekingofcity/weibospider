@@ -6,7 +6,7 @@ from requests_toolbelt.adapters.source import SourceAddressAdapter
 from config import get_adapter_ip
 
 
-class get_adapter():
+class Adapter():
     adapters: Optional[List[SourceAddressAdapter]] = None
 
     def __init__(self):
@@ -28,3 +28,6 @@ class get_adapter():
         if self.adapters:
             return self.adapters[worker_index % len(self.adapters)]
         return None
+
+
+ADAPTER = Adapter()
