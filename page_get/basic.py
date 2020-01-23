@@ -2,16 +2,18 @@ import os
 import time
 import signal
 import json
+from typing import List
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests_toolbelt.adapters.source import SourceAddressAdapter
+from billiard import current_process
 
 from config import headers
 from logger import crawler
 from login import get_cookies
 from db.dao import LoginInfoOper
-from utils import (send_email, getip)
+from utils import (send_email, getproxy)
 from db.redis_db import (Urls, Cookies)
 from page_parse import (is_403, is_404, is_complete)
 from decorators import (timeout_decorator, timeout)
@@ -71,7 +73,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
             # There is no difference between http and https address.
             # proxy = {'http': name_cookies[2], 'https': name_cookies[2], }
         else:
-            proxy = getip.getIPWithoutLogin('')
+            proxy = getproxy.getIPWithoutLogin('')
             if proxy[1]:
                 proxy = proxy[0]
                 if proxy['http']:

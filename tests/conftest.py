@@ -10,7 +10,7 @@ from config import create_all
 from tasks.login import login_task
 from login import get_cookies
 from page_get import get_page
-from utils.getip import get_host_ip
+from utils.getproxy import get_host_ip
 
 
 @pytest.fixture(scope='class', autouse=False)

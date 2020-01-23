@@ -11,7 +11,7 @@ from urllib.parse import quote_plus
 import requests
 
 from config import headers
-from utils import (code_verificate, getip)
+from utils import (code_verificate, getproxy)
 from page_parse import is_403
 from exceptions import (LoginWrongPasswordException,
                         LoginAccountForbiddenException, LoginDecodeException)
@@ -223,7 +223,7 @@ def do_login(name, password, proxy):
 
 
 def get_session(name, password):
-    proxy = getip.getIP("")
+    proxy = getproxy.getIP("")
 
     url, yundama_obj, cid, session = do_login(name, password, proxy)
 

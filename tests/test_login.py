@@ -10,7 +10,7 @@ from db.redis_db import cookies_con, Cookies
 from logger import crawler
 from page_get import get_page
 from tasks.login import push_account_to_login_pool, login_task
-from utils.getip import get_host_ip
+from utils.getproxy import get_host_ip
 
 login_name = os.getenv('WEIBO_ACCOUNT')
 ip = get_host_ip()  # type: str
