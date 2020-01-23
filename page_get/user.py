@@ -13,10 +13,13 @@ from page_parse import is_404
 from config import (get_samefollow_uid, get_user_info_expire_time)
 from db.dao import (UserOper, SeedidsOper)
 from page_parse.user import (enterprise, person, public)
+
 BASE_URL = 'http://weibo.com/p/{}{}/info?mod=pedit_more'
 NEWCARD_URL = 'https://www.weibo.com/aj/v6/user/newcard?ajwvr=6&name={}&type=1&callback=STK_{}39'
 SAMEFOLLOW_URL = 'https://weibo.com/p/100505{}/follow?relate=same_follow&amp;from=page_100505_profile&amp;wvr=6&amp;mod=bothfollow'
 # SAMEFOLLOW: only crawl user with 100505 domain
+
+SAMEFOLLOW_UID = get_samefollow_uid()
 
 
 def get_user_detail(user_id, html):
@@ -84,12 +87,11 @@ def get_url_from_web(user_id):
         # normal users
         elif domain == '100505':
             user = get_user_detail(user_id, html)
-            samefollow_uid = get_samefollow_uid()
-            if samefollow_uid.strip() != '':
-                samefollow_uid = samefollow_uid.split(',')
+            if SAMEFOLLOW_UID and SAMEFOLLOW_UID.strip() != '':
+                samefollow_uids = SAMEFOLLOW_UID.split(',')
                 url = SAMEFOLLOW_URL.format(user_id)
                 isFanHtml = get_page(url, auth_level=2)
-                person.get_isFan(isFanHtml, samefollow_uid, user_id)
+                person.get_isFan(isFanHtml, samefollow_uids, user_id)
         # enterprise or service
         else:
             user = get_enterprise_detail(user_id, html, url=url)
