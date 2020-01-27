@@ -10,7 +10,7 @@ from config import create_all
 from tasks.login import login_task
 from login import get_cookies
 from page_get import get_page
-from utils.getproxy import get_host_ip
+from utils.adapter import ADAPTER
 
 
 @pytest.fixture(scope='class', autouse=False)
@@ -25,7 +25,7 @@ def session():
 
 @pytest.fixture(scope='function', autouse=False)
 def get_page_2_setup():
-    ip = get_host_ip()  # type: str
+    ip = ADAPTER.get_host_ip()  # type: str
     BASE_URL = 'https://weibo.com/aj/v6/like/likelist?ajwvr=6&mid={}&issingle=1&type=0&_t=0&__rnd={}'
     cur_time = int(time.time() * 1000)
     cur_url = BASE_URL.format('4336987379189211', cur_time)

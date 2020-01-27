@@ -11,7 +11,7 @@ from redis.sentinel import Sentinel
 from logger import crawler
 from config import (get_redis_args, get_share_host_count, get_running_mode,
                     get_cookie_expire_time, get_ip_expire_time)
-from utils.getproxy import get_host_ip
+from utils.adapter import get_host_ip
 
 
 MODE = get_running_mode()

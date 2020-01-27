@@ -10,10 +10,10 @@ from db.redis_db import cookies_con, Cookies
 from logger import crawler
 from page_get import get_page
 from tasks.login import push_account_to_login_pool, login_task
-from utils.getproxy import get_host_ip
+from utils.adapter import ADAPTER
 
 login_name = os.getenv('WEIBO_ACCOUNT')
-ip = get_host_ip()  # type: str
+ip = ADAPTER.get_host_ip()
 
 
 class TestCookiesPolicy_Normal:

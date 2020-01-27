@@ -12,7 +12,7 @@ from logger import crawler
 from login import get_cookies
 from db.dao import LoginInfoOper
 from utils import (send_email, getproxy)
-from utils.get_adapter import ADAPTER
+from utils.adapter import ADAPTER
 from db.redis_db import (Urls, Cookies)
 from page_parse import (is_403, is_404, is_complete)
 from decorators import (timeout_decorator, timeout)
