@@ -65,9 +65,6 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
                     )
                     send_email()
                     os.kill(os.getppid(), signal.SIGTERM)
-
-            # There is no difference between http and https address.
-            # proxy = {'http': name_cookies[2], 'https': name_cookies[2], }
         else:
             proxy = getproxy.getIPWithoutLogin('')
             if proxy[1]:
@@ -77,8 +74,6 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
             else:
                 crawler.warning('No more proxy available')
                 os.kill(os.getppid(), signal.SIGTERM)
-            # if proxy['http'] is None:
-            #     crawler.warning('No available ip in ip pools. Using local ip instead.')
 
         try:
             with requests.Session() as s:
@@ -97,8 +92,7 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
 
                 resp = s.get(url,
                              timeout=TIME_OUT,
-                             verify=False,
-                             proxies=proxy)
+                             verify=False)
         except (requests.exceptions.ReadTimeout,
                 requests.exceptions.ConnectionError, AttributeError) as e:
             crawler.warning(
