@@ -81,31 +81,24 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
             #     crawler.warning('No available ip in ip pools. Using local ip instead.')
 
         try:
-            if auth_level == 2:
-                resp = requests.get(url,
-                                    headers=headers,
-                                    cookies=name_cookies[1],
-                                    timeout=TIME_OUT,
-                                    verify=False)
-            elif auth_level == 1:
-                with requests.Session() as s:
-                    s.headers.update(headers)
+            with requests.Session() as s:
+                s.headers.update(headers)
+
+                if auth_level == 2:
+                    s.cookies.update(name_cookies[1])
+                elif auth_level == 1:
                     s.cookies.update(COOKIES)
-                    adapter = ADAPTER.get_adapter(current_process().index)
-                    if adapter:
-                        # requests via another ip
-                        s.mount('http://', adapter)
-                        s.mount('https://', adapter)
-                    resp = s.get(url,
-                                 timeout=TIME_OUT,
-                                 verify=False,
-                                 proxies=proxy)
-            else:
-                resp = requests.get(url,
-                                    headers=headers,
-                                    timeout=TIME_OUT,
-                                    verify=False,
-                                    proxies=proxy)
+
+                adapter = ADAPTER.get_adapter(current_process().index)
+                if adapter:
+                    # requests via another ip
+                    s.mount('http://', adapter)
+                    s.mount('https://', adapter)
+
+                resp = s.get(url,
+                             timeout=TIME_OUT,
+                             verify=False,
+                             proxies=proxy)
         except (requests.exceptions.ReadTimeout,
                 requests.exceptions.ConnectionError, AttributeError) as e:
             crawler.warning(
