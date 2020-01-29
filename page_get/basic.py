@@ -47,9 +47,10 @@ def get_page(url, auth_level=2, is_ajax=False, need_proxy=False):
     :param need_proxy: whether the request need a http/https proxy
     :return: response text, when a exception is raised, return ''
     """
-    crawler.debug('the crawling url is {url}'.format(url=url))
-    count = 0
+    host_ip = ADAPTER.get_host_ip(current_process().index)
+    crawler.debug(f'the crawling url is {url} via {host_ip}')
 
+    count = 0
     while count < MAX_RETRIES:
         if auth_level == 2:
             name_cookies = Cookies.fetch_cookies()
