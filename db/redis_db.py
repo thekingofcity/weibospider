@@ -6,6 +6,7 @@ from typing import Tuple
 
 import redis
 from redis.sentinel import Sentinel
+from billiard import current_process
 
 from logger import crawler
 from config import (get_redis_args, get_share_host_count, get_running_mode,
@@ -94,7 +95,7 @@ class Cookies(object):
             Tuple[str, bytes] -- [account name, account cookies]
         """
 
-        ip = ADAPTER.get_host_ip()
+        ip = ADAPTER.get_host_ip(current_process().index)
         pid = os.getpid()
         account = None
         while not account:
@@ -254,7 +255,7 @@ class Cookies(object):
             name {str} -- [account name]
         """
 
-        ip = ADAPTER.get_host_ip()
+        ip = ADAPTER.get_host_ip(current_process().index)
         crawler.warning('cookies banned {uid}'.format(uid=name))
         cls.__delete_cookies(ip, name)
 
