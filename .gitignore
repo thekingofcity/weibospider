@@ -11,5 +11,5 @@ config/*.yaml
 */.cache/
 .mypy_cache/
 first_task_execution/user_name_first.py
-first_task_execution/extend_user_first.py
 first_task_execution/rpc.py
+first_task_execution/login_first.py
