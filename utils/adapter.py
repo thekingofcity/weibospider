@@ -1,3 +1,16 @@
+"""Request via another ip.
+
+The ip address should be in config/instance.yaml.
+
+After importing this module, the ADAPTER is initialized and
+import it like ```from utils.adapter import ADAPTER```
+
+This module can not be done without following info:
+
+https://stackoverflow.com/questions/53556884/python-cannot-bind-requests-to-network-interface
+
+https://stackoverflow.com/questions/17177491/get-worker-id-in-celery
+"""
 from typing import List, Tuple, Optional
 import socket
 
