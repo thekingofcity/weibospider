@@ -20,10 +20,10 @@ from config import get_adapter_ip
 
 
 class Adapter():
-    adapters: Optional[List[Tuple[str, SourceAddressAdapter]]] = None
+    adapters: Optional[List[Tuple[str, SourceAddressAdapter]]] = []
 
     def __init__(self):
-        APAPTER_IPS_RAW: str = get_adapter_ip()
+        APAPTER_IPS_RAW: Optional[str] = get_adapter_ip()
         if APAPTER_IPS_RAW:
             APAPTER_IPS: List[str] = APAPTER_IPS_RAW.split(',')
             try:
@@ -33,10 +33,8 @@ class Adapter():
             except socket.error:
                 return
 
-            self.adapters: List[Tuple[str, SourceAddressAdapter]] = [
-                (ip.strip(), SourceAddressAdapter(ip.strip()))
-                for ip in APAPTER_IPS
-            ]
+            self.adapters = [(ip.strip(), SourceAddressAdapter(ip.strip()))
+                             for ip in APAPTER_IPS]
 
     def get_adapter(self, worker_index: int) -> Optional[SourceAddressAdapter]:
         if self.adapters and worker_index:
