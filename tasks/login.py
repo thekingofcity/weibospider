@@ -18,12 +18,15 @@ def login_task(name, data):
     if retry <= 3:
         try:
             session, proxy = get_session(name, password)
-            Cookies.store_cookies(name, password, session.cookies.get_dict(), proxy['http'])
+            Cookies.store_cookies(name, password, session.cookies.get_dict(),
+                                  proxy['http'])
             return
         except (LoginAccountForbiddenException, LoginWrongPasswordException,
                 LoginDecodeException):
             retry += 1
-    elif retry >=30:
+        except Exception:
+            retry += 1
+    elif retry >= 30:
         # fix for retry > 3
         retry = 0
     else:
@@ -38,11 +41,10 @@ def execute_login_task():
     for name, data in Cookies.get_account_from_login_pool():
         # to avoid duplicate login task when login node is down
         Cookies.remove_account_from_login_pool(name)
-        app.send_task(
-            'tasks.login.login_task',
-            args=(name, data.decode('utf-8')),
-            queue='login_queue',
-            routing_key='for_login')
+        app.send_task('tasks.login.login_task',
+                      args=(name, data.decode('utf-8')),
+                      queue='login_queue',
+                      routing_key='for_login')
 
 
 def check_heartbeat():
@@ -51,7 +53,7 @@ def check_heartbeat():
 
 def cookies_banned(name):
     """[test method, called in node]
-    
+
     Arguments:
         name {[str]} -- [name]
     """
@@ -61,7 +63,7 @@ def cookies_banned(name):
 
 def push_account_to_login_pool(name, password):
     """[test method, called in master]
-    
+
     Arguments:
         name {[str]} -- [name]
         password {[str]} -- [password]
