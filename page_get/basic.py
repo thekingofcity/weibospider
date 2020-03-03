@@ -32,7 +32,8 @@ os.environ['REQUESTS_CA_BUNDLE'] = os.path.join(os.sep, '/etc/ssl/certs',
 
 
 def is_banned(url):
-    if 'unfreeze' in url or 'accessdeny' in url or 'userblock' in url or 'verifybmobile' in url:
+    if any(keyword in url for keyword in
+           ['unfreeze', 'accessdeny', 'userblock', 'verifybmobile']):
         return True
     return False
 
