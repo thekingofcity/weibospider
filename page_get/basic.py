@@ -4,7 +4,6 @@ import signal
 import json
 
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from billiard import current_process
 
 from config import headers
@@ -13,7 +12,7 @@ from login import get_cookies
 from db.dao import LoginInfoOper
 from utils import (send_email, getproxy)
 from utils.adapter import ADAPTER
-from db.redis_db import (Urls, Cookies)
+from db.redis_db import Cookies
 from page_parse import (is_403, is_404, is_complete)
 from decorators import (timeout_decorator, timeout)
 from config import (get_timeout, get_crawl_interal, get_excp_interal,
@@ -26,9 +25,10 @@ EXCP_INTERAL = get_excp_interal()
 login_interval = int(get_login_interval())
 COOKIES = get_cookies()
 
-# Disable annoying InsecureRequestWarning
-# https://stackoverflow.com/questions/27981545/suppress-insecurerequestwarning-unverified-https-request-is-being-made-in-pytho
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+# Instead of disable warning, why not use it as docs suggested
+# https://stackoverflow.com/questions/42982143/python-requests-how-to-use-system-ca-certificates-debian-ubuntu
+os.environ['REQUESTS_CA_BUNDLE'] = os.path.join(os.sep, '/etc/ssl/certs',
+                                                'ca-certificates.crt')
 
 
 def is_banned(url):
