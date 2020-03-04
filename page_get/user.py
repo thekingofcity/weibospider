@@ -9,9 +9,8 @@ from bs4 import BeautifulSoup
 from db.models import User
 from logger import storage, crawler
 from .basic import get_page
-from page_parse import is_404
 from config import (get_samefollow_uid, get_user_info_expire_time)
-from db.dao import (UserOper, SeedidsOper)
+from db.dao import UserOper
 from page_parse.user import (enterprise, person, public)
 
 BASE_URL = 'http://weibo.com/p/{}{}/info?mod=pedit_more'
@@ -76,40 +75,39 @@ def get_url_from_web(user_id):
     url = BASE_URL.format('100505', user_id)
     html = get_page(url, auth_level=1)
 
-    if not is_404(html):
-        domain = public.get_userdomain(html)
+    if not html:
+        return None
 
-        # writers(special users)
-        if domain == '103505' or domain == '100306':
-            url = BASE_URL.format(domain, user_id)
-            html = get_page(url)
-            user = get_user_detail(user_id, html)
-        # normal users
-        elif domain == '100505':
-            user = get_user_detail(user_id, html)
-            if SAMEFOLLOW_UID and SAMEFOLLOW_UID.strip() != '':
-                samefollow_uids = SAMEFOLLOW_UID.split(',')
-                url = SAMEFOLLOW_URL.format(user_id)
-                isFanHtml = get_page(url, auth_level=2)
-                person.get_isFan(isFanHtml, samefollow_uids, user_id)
-        # enterprise or service
-        else:
-            user = get_enterprise_detail(user_id, html, url=url)
+    domain = public.get_userdomain(html)
 
-        if user is None:
-            return None
+    # writers(special users)
+    if domain == '103505' or domain == '100306':
+        url = BASE_URL.format(domain, user_id)
+        html = get_page(url)
+        user = get_user_detail(user_id, html)
+    # normal users
+    elif domain == '100505':
+        user = get_user_detail(user_id, html)
+        if SAMEFOLLOW_UID and SAMEFOLLOW_UID.strip() != '':
+            samefollow_uids = SAMEFOLLOW_UID.split(',')
+            url = SAMEFOLLOW_URL.format(user_id)
+            isFanHtml = get_page(url, auth_level=2)
+            person.get_isFan(isFanHtml, samefollow_uids, user_id)
+    # enterprise or service
+    else:
+        user = get_enterprise_detail(user_id, html, url=url)
 
-        user.name = public.get_username(html)
-        user.head_img = public.get_headimg(html)
-        user.verify_type = public.get_verifytype(html)
-        user.verify_info = public.get_verifyreason(html, user.verify_type)
-        user.level = public.get_level(html)
+    if user is None:
+        return None
 
-        if user.name:
-            return user
-        else:
-            return None
+    user.name = public.get_username(html)
+    user.head_img = public.get_headimg(html)
+    user.verify_type = public.get_verifytype(html)
+    user.verify_info = public.get_verifyreason(html, user.verify_type)
+    user.level = public.get_level(html)
 
+    if user.name:
+        return user
     else:
         return None
 
