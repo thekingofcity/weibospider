@@ -33,22 +33,44 @@ if sentinel_args:
     # default socket timeout is 2 secs
     master_name = REDIS_ARGS.get('master')
     socket_timeout = int(REDIS_ARGS.get('socket_timeout', 2))
-    sentinel = Sentinel([(args['host'], args['port']) for args in sentinel_args], password=password,
+    sentinel = Sentinel([(args['host'], args['port'])
+                         for args in sentinel_args],
+                        password=password,
                         socket_timeout=socket_timeout)
-    cookies_con = sentinel.master_for(master_name, socket_timeout=socket_timeout, db=cookies_db)
-    broker_con = sentinel.master_for(master_name, socket_timeout=socket_timeout, db=broker_db)
-    urls_con = sentinel.master_for(master_name, socket_timeout=socket_timeout, db=urls_db)
-    id_name_con = sentinel.master_for(master_name, socket_timeout=socket_timeout, db=id_name_db)
+    cookies_con = sentinel.master_for(master_name,
+                                      socket_timeout=socket_timeout,
+                                      db=cookies_db)
+    broker_con = sentinel.master_for(master_name,
+                                     socket_timeout=socket_timeout,
+                                     db=broker_db)
+    urls_con = sentinel.master_for(master_name,
+                                   socket_timeout=socket_timeout,
+                                   db=urls_db)
+    id_name_con = sentinel.master_for(master_name,
+                                      socket_timeout=socket_timeout,
+                                      db=id_name_db)
 else:
     host = REDIS_ARGS.get('host', '127.0.0.1')
     port = REDIS_ARGS.get('port', 6379)
-    cookies_con = redis.Redis(host=host, port=port, password=password, db=cookies_db)
-    broker_con = redis.Redis(host=host, port=port, password=password, db=broker_db)
+    cookies_con = redis.Redis(host=host,
+                              port=port,
+                              password=password,
+                              db=cookies_db)
+    broker_con = redis.Redis(host=host,
+                             port=port,
+                             password=password,
+                             db=broker_db)
     urls_con = redis.Redis(host=host, port=port, password=password, db=urls_db)
-    id_name_con = redis.Redis(host=host, port=port, password=password, db=id_name_db)
+    id_name_con = redis.Redis(host=host,
+                              port=port,
+                              password=password,
+                              db=id_name_db)
 
 
 class Cookies(object):
+    script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end"
+    script_obj = cookies_con.register_script(script)
+
     @classmethod
     def store_cookies(cls, name, password, cookies, proxy):
         pickled_cookies = json.dumps({
@@ -90,7 +112,7 @@ class Cookies(object):
                                 return None, None
                         unlock
                 return account[0], account[1]['cookies']
-        
+
         Returns:
             Tuple[str, bytes] -- [account name, account cookies]
         """
@@ -108,10 +130,12 @@ class Cookies(object):
                     cls.__unlock(ip+"mutex", pid)
                     continue
                 # we have to acquire new cookies form account_pool
-                # account = (name, {'cookies': cookies,'password': password, ...})
+                # account = (name, {'cookies': cookies,
+                #                   'password': password, ...})
                 for account in cookies_con.hscan_iter('account_pool'):
                     if cls.check_cookies_timeout(account[1].decode('utf-8')):
-                        cls.expire_cookies_in_acount_pool(account[0].decode('utf-8'))
+                        cls.expire_cookies_in_acount_pool(
+                            account[0].decode('utf-8'))
                         account = None
                     else:
                         break
@@ -140,7 +164,7 @@ class Cookies(object):
     def remove_account_from_login_pool(cls, name: str):
         """[remove account from login_pool]
             Used in successful login task
-        
+
         Arguments:
             name {str} -- [name]
         """
@@ -150,7 +174,7 @@ class Cookies(object):
     @classmethod
     def push_account_to_login_pool(cls, name: str, password: str, retry: int):
         """[push account to login_pool]
-        
+
         Arguments:
             name {str} -- [name]
             password {str} -- [password]
@@ -158,7 +182,8 @@ class Cookies(object):
         """
 
         if cookies_con.hexists('login_pool', name):
-            # multiple thread requesting weibo with account A may get banned at the same time
+            # multiple thread requesting weibo with account A
+            # may get banned at the same time
             # but they will all call abnormal_cookies_in_ip
             return
         pickled_cookies = json.dumps({'password': password, 'retry': retry})
@@ -167,9 +192,10 @@ class Cookies(object):
     @classmethod
     def get_account_from_login_pool(cls) -> Tuple[str, bytes]:
         """[generator of account in login_pool]
-        
+
         Returns:
-            Tuple[str, bytes] -- [account name, account password and retry times in json]
+            Tuple[str, bytes] -- [account name, account password and
+                                  retry times in json]
         """
 
         for account in cookies_con.hscan_iter('login_pool'):
@@ -202,21 +228,24 @@ class Cookies(object):
         for ip in cookies_con.hscan_iter('heartbeat'):
             last_timestamp = ip[1].decode('utf-8')  # type: str
             ip = ip[0].decode('utf-8')
-            last_timestamp = datetime.datetime.fromtimestamp(float(last_timestamp))  # type: datetime
-            if datetime.datetime.utcnow() - last_timestamp > datetime.timedelta(minutes=ip_expire_time):
+            last_timestamp = datetime.datetime.fromtimestamp(
+                float(last_timestamp))  # type: datetime
+            if datetime.datetime.utcnow(
+            ) - last_timestamp > datetime.timedelta(minutes=ip_expire_time):
                 print('ip/pod:{ip} has missed its heartbeat'.format(ip=ip))
-                # crawler.warning('ip/pod:{ip} has missed its heartbeat'.format(ip=ip))
                 for account in cookies_con.hscan_iter(ip):
                     if cls.check_cookies_timeout(account[1].decode('utf-8')):
-                        # If the cookies expired, we should move it to login_pool waiting for login
+                        # If the cookies expired, we should move it
+                        # to login_pool waiting for login
                         print('cookies expired {uid}'.format(uid=account[0]))
                         cls.__delete_cookies(ip, account[0].decode('utf-8'))
                     else:
                         # else move it to account_pool for another request
                         print('cookies valid {uid}'.format(uid=account[0]))
-                        cookies_con.hset('account_pool', account[0], account[1])
+                        cookies_con.hset('account_pool', account[0],
+                                         account[1])
                     cookies_con.hdel(ip, account[0])
-                assert cookies_con.exists(ip)==0
+                assert cookies_con.exists(ip) == 0
                 cls.remove_heartbeat(ip)
 
     @classmethod
@@ -250,7 +279,7 @@ class Cookies(object):
     @classmethod
     def abnormal_cookies_in_ip(cls, name: str):
         """[Be called if 1. cookies banned 2. cookies timeout]
-        
+
         Arguments:
             name {str} -- [account name]
         """
@@ -263,33 +292,31 @@ class Cookies(object):
     def __delete_cookies(cls, key: str, name: str):
         """[delete cookies]
         move cookies from ip or account_pool to login_pool
-        
+
         Arguments:
             key {[str]} -- [ip or account_pool]
             name {[str]} -- [account name]
         """
 
-        cls.__lock(key+"mutex",os.getpid())
+        cls.__lock(key + "mutex", os.getpid())
         account = cookies_con.hget(key, name)
         if account is None:
-            cls.__unlock(key+"mutex",os.getpid())
+            cls.__unlock(key + "mutex", os.getpid())
             return
         cookies_con.hdel(key, name)
         cookies = json.loads(account.decode('utf-8'))
         cls.push_account_to_login_pool(name, cookies['password'], 0)
-        cls.__unlock(key+"mutex",os.getpid())
+        cls.__unlock(key + "mutex", os.getpid())
 
     @classmethod
-    def __lock(cls, lockKey:str, requestId:str):
+    def __lock(cls, lockKey: str, requestId: str):
         while not cookies_con.set(lockKey, requestId, ex=1, nx=True):
             time.sleep(1)
         return
 
     @classmethod
-    def __unlock(cls, lockKey:str, requestId:str)->bool:
-        script="if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end"
-        script_obj=cookies_con.register_script(script)
-        return script_obj(keys=[lockKey],args=[requestId])
+    def __unlock(cls, lockKey: str, requestId: str) -> bool:
+        return cls.script_obj(keys=[lockKey], args=[requestId])
 
 
 class Urls(object):
