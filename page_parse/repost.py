@@ -59,8 +59,7 @@ def get_repost_list(html, mid):
             wb_repost.user_name = repost.find(attrs={'class': 'list_con'}).find(attrs={'class': 'WB_text'}).find('a').\
                 text
             wb_repost.repost_time = repost.find(attrs={'class': 'WB_from S_txt2'}).find('a').get('title')
-            wb_repost.weibo_url = REPOST_URL.format(repost.find(attrs={'class': 'WB_from S_txt2'}).find('a').
-                                                    get('href'))
+            wb_repost.weibo_url = repost.find(attrs={'class': 'WB_from S_txt2'}).find('a').get('href')
             parents = repost.find(attrs={'class': 'WB_text'}).find(attrs={'node-type': 'text'})
             wb_repost.root_weibo_id = mid
 
