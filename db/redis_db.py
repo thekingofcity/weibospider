@@ -329,7 +329,7 @@ class Urls(object):
 class IdNames(object):
     @classmethod
     def store_id_name(cls, user_name, user_id):
-        id_name_con.set(user_name, user_id)
+        id_name_con.set(user_name, user_id, ex=24 * 3600)
 
     @classmethod
     def delele_id_name(cls, user_name):
