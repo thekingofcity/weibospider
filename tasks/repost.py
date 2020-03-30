@@ -35,11 +35,17 @@ def crawl_repost_by_page(mid, page_num):
     #     WbDataOper.set_weibo_repost_crawled(mid)
 
     for repost_datum in repost_data:
+        uid: str = repost_datum.user_id
         app.send_task(
             'tasks.user.crawl_person_infos',
-            args=(repost_datum.user_id, ),
+            args=(uid, ),
             queue='user_crawler',
             routing_key='for_user_info')
+        app.send_task(
+            'tasks.home.crawl_weibo_datas',
+            args=(uid, True),
+            queue='home_crawler',
+            routing_key='home_info')
 
     return html, repost_data
 

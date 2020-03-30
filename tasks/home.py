@@ -13,6 +13,9 @@ from page_parse.home import (
     get_data, get_ajax_data, get_total_page)
 
 
+TIME_AFTER = time.mktime(
+    time.strptime(str(get_time_after()), '%Y-%m-%d %H:%M:%S'))
+
 # only crawls origin weibo
 # HOME_URL = 'http://weibo.com/u/{}?is_ori=1&is_tag=0&profile_ftype=1&page={}'
 # AJAX_URL = 'http://weibo.com/p/aj/v6/mblog/mbloglist?ajwvr=6&domain={}&pagebar={}&is_ori=1&id={}{}&page={}' \
@@ -20,11 +23,12 @@ from page_parse.home import (
 
 # crawls all weibo
 HOME_URL = 'http://weibo.com/u/{}?is_all=1&page={}'
-AJAX_URL = 'http://weibo.com/p/aj/v6/mblog/mbloglist?ajwvr=6&domain={}&wvr=6&is_all=1&pagebar={}&id={}{}' \
-           '&feed_type=0&page={}&pre_page={}&__rnd={}'
+AJAX_URL = ('http://weibo.com/p/aj/v6/mblog/mbloglist?ajwvr=6&domain={}'
+            '&wvr=6&is_all=1&pagebar={}&id={}{}&feed_type=0&page={}'
+            '&pre_page={}&__rnd={}')
 
 
-def determine(weibo_datum, timeafter):
+def exist(weibo_datum, timeafter):
     weibo_time = time.mktime(
         time.strptime(weibo_datum.create_time, '%Y-%m-%d %H:%M:%S'))
     if weibo_time < timeafter:
@@ -46,11 +50,9 @@ def crawl_ajax_page(url, auth_level):
     if not ajax_wbdata:
         return ''
 
-    timeafter = time.mktime(
-        time.strptime(get_time_after(), '%Y-%m-%d %H:%M:%S'))
     ajax_wbdata = [
         ajax_wbdatum for ajax_wbdatum in ajax_wbdata
-        if determine(ajax_wbdatum, timeafter)
+        if exist(ajax_wbdatum, TIME_AFTER)
     ]
 
     WbDataOper.add_all(ajax_wbdata)
@@ -58,7 +60,7 @@ def crawl_ajax_page(url, auth_level):
 
 
 @app.task(ignore_result=True)
-def crawl_weibo_datas(uid):
+def crawl_weibo_datas(uid, only_head=False):
     limit = get_max_home_page()
     cur_page = 1
     while cur_page <= limit:
@@ -75,32 +77,20 @@ def crawl_weibo_datas(uid):
 
         # Check whether weibo created after time in spider.yaml
         original_length_weibo_data = len(weibo_data)
-        timeafter = time.mktime(
-            time.strptime(get_time_after(), '%Y-%m-%d %H:%M:%S'))
         weibo_data = [
             weibo_datum for weibo_datum in weibo_data
-            if determine(weibo_datum, timeafter)
+            if exist(weibo_datum, TIME_AFTER)
         ]
 
         for weibo_datum in weibo_data:
             try:
                 WbDataOper.add_one(weibo_datum)
             except Exception as e:
-                print(weibo_datum.weibo_id)
-                print(weibo_datum.weibo_cont)
-                print("weibo_img",weibo_datum.weibo_img)
-                print("weibo_video",weibo_datum.weibo_video)
-                print("weibo_img_path",weibo_datum.weibo_img_path)
-                print(weibo_datum.repost_num)
-                print(weibo_datum.comment_num)
-                print(weibo_datum.praise_num)
-                print(weibo_datum.uid)
-                print(weibo_datum.is_origin)
-                print(weibo_datum.origin_weibo_id)
-                print(weibo_datum.device)
-                print(weibo_datum.create_time)
                 print(e)
         # WbDataOper.add_all(weibo_data)
+
+        if only_head:
+            return
 
         # the forwarded weibo might interfere with the origin weibo
         # # If the weibo isn't created after the given time, jump out the loop
