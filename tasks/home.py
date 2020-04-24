@@ -60,7 +60,7 @@ def crawl_ajax_page(url, auth_level):
 
 
 @app.task(ignore_result=True)
-def crawl_weibo_datas(uid, only_head=False):
+def crawl_weibo_datas(uid, only_head=False, interaction=False):
     limit = get_max_home_page()
     cur_page = 1
     while cur_page <= limit:
@@ -87,6 +87,12 @@ def crawl_weibo_datas(uid, only_head=False):
                 WbDataOper.add_one(weibo_datum)
             except Exception as e:
                 print(e)
+            if interaction:
+                app.send_task('tasks.repost.crawl_repost_page',
+                              args=(weibo_datum.weibo_id, uid),
+                              queue='repost_crawler',
+                              routing_key='repost_info')
+
         # WbDataOper.add_all(weibo_data)
 
         if only_head:
@@ -146,6 +152,6 @@ def execute_home_task(uid: str = None):
     else:
         app.send_task(
             'tasks.home.crawl_weibo_datas',
-            args=(uid, ),
+            args=(uid, True),
             queue='home_crawler',
             routing_key='home_info')
