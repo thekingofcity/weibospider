@@ -15,5 +15,5 @@ if __name__ == '__main__':
             execute_home_task(sys.argv[1])
         else:
             for line in open(r'uid.txt', 'r', encoding='utf8'):
-                if line:
+                if line.strip():
                     execute_home_task(line.strip())

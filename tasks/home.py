@@ -152,6 +152,6 @@ def execute_home_task(uid: str = None):
     else:
         app.send_task(
             'tasks.home.crawl_weibo_datas',
-            args=(uid, True),
+            args=(uid, True, True),
             queue='home_crawler',
             routing_key='home_info')
