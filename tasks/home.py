@@ -75,6 +75,13 @@ def crawl_weibo_datas(uid, only_head=False, interaction=False):
             crawler.warning("user {} has no weibo".format(uid))
             return
 
+        if interaction:
+            for weibo_datum in weibo_data:
+                app.send_task('tasks.repost.crawl_repost_page',
+                              args=(weibo_datum.weibo_id, uid),
+                              queue='repost_crawler',
+                              routing_key='repost_info')
+
         # Check whether weibo created after time in spider.yaml
         original_length_weibo_data = len(weibo_data)
         weibo_data = [
@@ -87,12 +94,6 @@ def crawl_weibo_datas(uid, only_head=False, interaction=False):
                 WbDataOper.add_one(weibo_datum)
             except Exception as e:
                 print(e)
-            if interaction:
-                app.send_task('tasks.repost.crawl_repost_page',
-                              args=(weibo_datum.weibo_id, uid),
-                              queue='repost_crawler',
-                              routing_key='repost_info')
-
         # WbDataOper.add_all(weibo_data)
 
         if only_head:
