@@ -78,7 +78,7 @@ def crawl_weibo_datas(uid, only_head=False, interaction=False):
         if interaction:
             for weibo_datum in weibo_data:
                 app.send_task('tasks.repost.crawl_repost_page',
-                              args=(weibo_datum.weibo_id, uid),
+                              args=(weibo_datum.weibo_id, uid, True),
                               queue='repost_crawler',
                               routing_key='repost_info')
 

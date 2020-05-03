@@ -51,7 +51,7 @@ def crawl_repost_by_page(mid, page_num):
 
 
 @app.task(ignore_result=True)
-def crawl_repost_page(mid, uid):
+def crawl_repost_page(mid, uid, only_head=True):
     limit = get_max_repost_page() + 1
     first_repost_data = crawl_repost_by_page(mid, 1)
     total_page = repost.get_total_page(first_repost_data[0])
@@ -65,14 +65,15 @@ def crawl_repost_page(mid, uid):
     if total_page < limit:
         limit = total_page + 1
 
-    for page_num in range(2, limit):
-        app.send_task('tasks.repost.crawl_repost_by_page',
-                      args=(mid, page_num),
-                      queue='repost_page_crawler',
-                      routing_key='repost_page_info')
-        # cur_repost_datas = crawl_repost_by_page(mid, page_num)[1]
-        # if cur_repost_datas:
-        #     repost_datas.extend(cur_repost_datas)
+    if only_head:
+        for page_num in range(2, limit):
+            app.send_task('tasks.repost.crawl_repost_by_page',
+                          args=(mid, page_num),
+                          queue='repost_page_crawler',
+                          routing_key='repost_page_info')
+            # cur_repost_datas = crawl_repost_by_page(mid, page_num)[1]
+            # if cur_repost_datas:
+            #     repost_datas.extend(cur_repost_datas)
 
     for index, repost_obj in enumerate(repost_datas):
         user_id = IdNames.fetch_uid_by_name(repost_obj.parent_user_name)
