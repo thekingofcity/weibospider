@@ -181,7 +181,7 @@ def get_fans_or_follows(html, uid, type, url = None):
     scripts = soup.find_all('script')
 
     isDuplicateFlag = False  # flag indicating already crawled element/page
-                             # which can save redundant request times
+    # which can save redundant request times
 
     user_ids = list()
     relations = list()
@@ -194,24 +194,22 @@ def get_fans_or_follows(html, uid, type, url = None):
             soup = BeautifulSoup(cont, 'html.parser')
             follows = soup.find(attrs={'class': 'follow_box'}).find_all(attrs={'class': 'follow_item S_line2'})
             patternUID = re.compile(r'uid=(.*?)&')
-            patternFROM = re.compile(r'通过.+?关注')
+            patternFROM = re.compile(r'通过(.+?)关注')
             for follow in follows:
                 m = re.search(patternUID, str(follow))
                 if m:
                     r = m.group(1)
                     # filter invalid ids
                     if r.isdigit():
-                        isDuplicate = UserRelationOper.get_user_by_uid(uid, r, type)
+                        isDuplicate = UserRelationOper.get_user_by_uid(
+                            uid, r, type)
                         if not isDuplicate:
                             n = re.search(patternFROM, follow.text)
                             # 存在没有关注来源的情况
-                            if n is not None:
-                                n = n.group(0)
-                                n = n[2:len(n)-2]
-                            else:
-                                n = ""
+                            follow_from = n.group(1) if n else ""
                             user_ids.append(r)
-                            relations.append(UserRelation(uid, r, type, n))
+                            relations.append(
+                                UserRelation(uid, r, type, follow_from))
                         else:
                             isDuplicateFlag = True
             break
