@@ -65,7 +65,7 @@ def crawl_repost_page(mid, uid, only_head=True):
     if total_page < limit:
         limit = total_page + 1
 
-    if only_head:
+    if not only_head:
         for page_num in range(2, limit):
             app.send_task('tasks.repost.crawl_repost_by_page',
                           args=(mid, page_num),
