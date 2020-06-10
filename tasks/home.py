@@ -139,7 +139,7 @@ def crawl_weibo_datas(uid, only_head=False, interaction=False):
         cur_page += 1
 
 
-def execute_home_task(uid: str = None):
+def execute_home_task(uid: str = None, interaction=False):
     if not uid:
         # you can have many strategies to crawl user's home page, here we choose table seed_ids's uid
         # whose home_crawl is 0
@@ -153,6 +153,6 @@ def execute_home_task(uid: str = None):
     else:
         app.send_task(
             'tasks.home.crawl_weibo_datas',
-            args=(uid, True, True),
+            args=(uid, True, interaction),
             queue='home_crawler',
             routing_key='home_info')
