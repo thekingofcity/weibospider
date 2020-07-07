@@ -16,4 +16,4 @@ if __name__ == '__main__':
         else:
             for line in open(r'uid.txt', 'r', encoding='utf8'):
                 if line.strip():
-                    execute_home_task(line.strip())
+                    execute_home_task(line.strip(), True)
